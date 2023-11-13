@@ -1,6 +1,7 @@
 package login
 
 import (
+	"github.com/device-server/controller"
 	"github.com/device-server/domain/request"
 	"github.com/device-server/domain/response"
 	"github.com/gin-gonic/gin"
@@ -14,15 +15,24 @@ func Register(e *gin.Engine) {
 
 // 登陆
 func login(c *gin.Context) {
-	loginReq := request.Login{}
+	loginReq := request.LoginRequest{}
 	if err := c.ShouldBindJSON(&loginReq); err != nil {
 		c.JSON(http.StatusBadRequest, response.LoginResponse{response.BaseResponse{
 			Code: "400",
 			Msg:  err.Error(),
 		}})
 	} else {
+		var resp = response.LoginResponse{}
+		resp, err = controller.GetInstance().LoginService().Login(loginReq)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, response.LoginResponse{response.BaseResponse{
+				Code: "500",
+				Msg:  err.Error(),
+			}})
+		} else {
+			c.JSON(http.StatusOK, resp)
+		}
 
-		c.JSON(http.StatusOK, response.LoginResponse{})
 	}
 }
 

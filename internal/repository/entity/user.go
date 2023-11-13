@@ -8,3 +8,7 @@ type User struct {
 	Avatar   string `json:"avatar"`   // 头像
 	Remark   string `json:"remark"`   // 备注信息
 }
+
+func (a *User) TableName() string {
+	return "t_user"
+}

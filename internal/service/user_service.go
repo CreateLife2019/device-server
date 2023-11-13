@@ -5,6 +5,6 @@ import (
 	"github.com/device-server/domain/response"
 )
 
-type LoginService interface {
-	Login(request request.LoginRequest) (resp response.LoginResponse, err error)
+type UserService interface {
+	List(request request.UserListRequest) (resp response.UserListResponse, err error)
 }

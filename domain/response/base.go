@@ -1,12 +1,12 @@
 package response
 
 type BaseResponse struct {
-	Code string `json:"Code"`
-	Msg  string `json:"Msg"`
+	Code string `json:"code"`
+	Msg  string `json:"msg"`
 }
 
 type PageInfo struct {
-	PageNo   int64 `form:"pageNo" binding:"required"`
-	PageSize int64 `form:"pageSize" binding:"required"`
-	Total    int64 `form:"total" binding:"required"`
+	Page     int64 `json:"page"`
+	PageSize int64 `json:"pageSize"`
+	Total    int64 `json:"total"`
 }
