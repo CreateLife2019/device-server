@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"github.com/bwmarrin/snowflake"
 	"github.com/device-server/controller"
+	"github.com/device-server/domain/base"
 	"github.com/device-server/domain/constants"
-	"github.com/device-server/domain/request"
-	"github.com/device-server/domain/response"
+	http2 "github.com/device-server/domain/request/http"
+	http3 "github.com/device-server/domain/response/http"
 	"github.com/gin-gonic/gin"
 	"math/rand"
 	"net/http"
@@ -20,24 +21,24 @@ func Register(e *gin.Engine) {
 
 // 登陆
 func login(c *gin.Context) {
-	loginReq := request.LoginRequest{}
+	loginReq := http2.LoginRequest{}
 	if err := c.ShouldBindJSON(&loginReq); err != nil {
-		c.JSON(http.StatusBadRequest, response.LoginResponse{BaseResponse: response.BaseResponse{
+		c.JSON(http.StatusBadRequest, http3.LoginResponse{BaseResponse: base.BaseResponse{
 			Code: "400",
 			Msg:  err.Error(),
 		}})
 	} else {
-		var resp = response.LoginResponse{}
+		var resp = http3.LoginResponse{}
 		resp, err = controller.GetInstance().LoginService().Login(loginReq)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, response.LoginResponse{BaseResponse: response.BaseResponse{
+			c.JSON(http.StatusInternalServerError, http3.LoginResponse{BaseResponse: base.BaseResponse{
 				Code: "500",
 				Msg:  err.Error(),
 			}})
 		} else {
 			err = controller.GetInstance().VerifyCodeService().Check(loginReq.RequestId, loginReq.VerifyCode)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, response.LoginResponse{BaseResponse: response.BaseResponse{
+				c.JSON(http.StatusInternalServerError, http3.LoginResponse{BaseResponse: base.BaseResponse{
 					Code: "500",
 					Msg:  err.Error(),
 				}})
@@ -50,11 +51,11 @@ func login(c *gin.Context) {
 
 // 验证码
 func verifyCode(c *gin.Context) {
-	var resp = response.VerifyCodeResponse{}
+	var resp = http3.VerifyCodeResponse{}
 	// 生成一个验证码
 	node, err := snowflake.NewNode(1)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.LoginResponse{BaseResponse: response.BaseResponse{
+		c.JSON(http.StatusInternalServerError, http3.LoginResponse{BaseResponse: base.BaseResponse{
 			Code: "500",
 			Msg:  err.Error(),
 		}})
@@ -65,7 +66,7 @@ func verifyCode(c *gin.Context) {
 		// 保存数据哭
 		err = controller.GetInstance().VerifyCodeService().Save(resp.Data.RequestId, resp.Data.VerifyCode)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, response.LoginResponse{BaseResponse: response.BaseResponse{
+			c.JSON(http.StatusInternalServerError, http3.LoginResponse{BaseResponse: base.BaseResponse{
 				Code: "500",
 				Msg:  err.Error(),
 			}})

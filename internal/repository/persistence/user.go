@@ -7,4 +7,7 @@ import (
 
 type UserIer interface {
 	SearchUser(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (users []*entity.User, err error)
+	SaveOrUpdate(db *gorm.DB, user *entity.User) error
+	SaveOrUpdateExtend(db *gorm.DB, user *entity.UserExtend) error
+	Get(db *gorm.DB, scopes ...func(*gorm.DB) *gorm.DB) (account *entity.User, err error)
 }

@@ -1,10 +1,14 @@
-package response
+package http
+
+import (
+	"github.com/device-server/domain/base"
+)
 
 type VerifyCodeData struct {
 	RequestId  int64  `json:"requestId,string"`
 	VerifyCode string `json:"verifyCode"`
 }
 type VerifyCodeResponse struct {
-	BaseResponse
+	base.BaseResponse
 	Data VerifyCodeData `json:"data"`
 }

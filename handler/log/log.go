@@ -1,8 +1,9 @@
 package log
 
 import (
-	"github.com/device-server/domain/request"
-	"github.com/device-server/domain/response"
+	"github.com/device-server/domain/base"
+	http2 "github.com/device-server/domain/request/http"
+	http3 "github.com/device-server/domain/response/http"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -13,14 +14,14 @@ func Register(e *gin.Engine) {
 
 // 登陆日志
 func loginLogList(c *gin.Context) {
-	loginReq := request.LoginLogRequest{}
+	loginReq := http2.LoginLogRequest{}
 	if err := c.ShouldBindQuery(&loginReq); err != nil {
-		c.JSON(http.StatusBadRequest, response.LoginLogResponse{BaseResponse: response.BaseResponse{
+		c.JSON(http.StatusBadRequest, http3.LoginLogResponse{BaseResponse: base.BaseResponse{
 			Code: "400",
 			Msg:  err.Error(),
 		}})
 	} else {
 
-		c.JSON(http.StatusOK, response.LoginLogResponse{})
+		c.JSON(http.StatusOK, http3.LoginLogResponse{})
 	}
 }

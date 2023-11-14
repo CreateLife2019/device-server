@@ -1,4 +1,6 @@
-package response
+package http
+
+import "github.com/device-server/domain/base"
 
 type UserInfo struct {
 	Name       string `json:"name"`
@@ -13,10 +15,10 @@ type UserInfo struct {
 }
 
 type UserListData struct {
-	PageInfo
+	base.PageInfo
 	Users []UserInfo `json:"Users"`
 }
 type UserListResponse struct {
-	BaseResponse
+	base.BaseResponse
 	Data UserListData `json:"data"`
 }

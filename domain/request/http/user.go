@@ -1,7 +1,9 @@
-package request
+package http
+
+import "github.com/device-server/domain/base"
 
 type UserListRequest struct {
-	PageInfo
+	base.PageInfo
 }
 
 // 增加用户代理

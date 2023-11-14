@@ -1,10 +1,10 @@
 package service
 
 import (
-	"github.com/device-server/domain/request"
-	"github.com/device-server/domain/response"
+	"github.com/device-server/domain/request/http"
+	http2 "github.com/device-server/domain/response/http"
 )
 
 type LoginService interface {
-	Login(request request.LoginRequest) (resp response.LoginResponse, err error)
+	Login(request http.LoginRequest) (resp http2.LoginResponse, err error)
 }

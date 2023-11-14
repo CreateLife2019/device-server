@@ -4,6 +4,7 @@ import (
 	"github.com/device-server/controller"
 	"github.com/device-server/handler/log"
 	"github.com/device-server/handler/login"
+	"github.com/device-server/handler/tcp_client"
 	"github.com/device-server/handler/user"
 	"github.com/device-server/handler/web"
 	"github.com/gin-contrib/cors"
@@ -29,5 +30,5 @@ func Register(e *gin.Engine) {
 	user.Register(e)
 	log.Register(e)
 	login.Register(e)
-	controller.GetInstance().StartTcpServer()
+	controller.GetInstance().StartTcpServer(tcp_client.Onmessage)
 }

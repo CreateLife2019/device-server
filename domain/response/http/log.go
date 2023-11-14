@@ -1,6 +1,9 @@
-package response
+package http
 
-import "time"
+import (
+	"github.com/device-server/domain/base"
+	"time"
+)
 
 type LoginLogInfo struct {
 	Ip        string    `json:"Ip"`
@@ -8,7 +11,7 @@ type LoginLogInfo struct {
 }
 
 type LoginLogResponse struct {
-	BaseResponse
-	PageInfo
+	base.BaseResponse
+	base.PageInfo
 	LoginLogs []LoginLogInfo `json:"LoginLogs"`
 }

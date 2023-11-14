@@ -1,7 +1,6 @@
 package tcp_server
 
 import (
-	"bufio"
 	"crypto/tls"
 	"github.com/sirupsen/logrus"
 	"net"
@@ -18,15 +17,19 @@ type Server struct {
 	config                   *tls.Config
 	onNewClientCallback      func(c *Client)
 	onClientConnectionClosed func(c *Client, err error)
-	onNewMessage             func(c *Client, message string)
+	onNewMessage             func(c *Client, message []byte)
 }
 
 // Read client data from channel
 func (c *Client) listen() {
 	c.Server.onNewClientCallback(c)
-	reader := bufio.NewReader(c.conn)
 	for {
-		message, err := reader.ReadString('\n')
+		message := make([]byte, 1024)
+		n, err := c.conn.Read(message)
+		if err != nil {
+			break
+		}
+		logrus.Infof("read count:%d", n)
 		if err != nil {
 			err = c.conn.Close()
 			if err != nil {
@@ -35,7 +38,8 @@ func (c *Client) listen() {
 			c.Server.onClientConnectionClosed(c, err)
 			return
 		}
-		c.Server.onNewMessage(c, message)
+
+		c.Server.onNewMessage(c, message[:n])
 	}
 }
 
@@ -76,7 +80,7 @@ func (s *Server) OnClientConnectionClosed(callback func(c *Client, err error)) {
 }
 
 // OnNewMessage Called when Client receives new message
-func (s *Server) OnNewMessage(callback func(c *Client, message string)) {
+func (s *Server) OnNewMessage(callback func(c *Client, message []byte)) {
 	s.onNewMessage = callback
 }
 
@@ -119,7 +123,7 @@ func New(address string) *Server {
 	}
 
 	s.OnNewClient(func(c *Client) {})
-	s.OnNewMessage(func(c *Client, message string) {})
+	s.OnNewMessage(func(c *Client, message []byte) {})
 	s.OnClientConnectionClosed(func(c *Client, err error) {})
 
 	return s

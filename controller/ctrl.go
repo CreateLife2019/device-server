@@ -34,6 +34,7 @@ func (s *Service) UserService() service.UserService {
 func (s *Service) VerifyCodeService() service.VerifyCodeService {
 	return s.verifyCode
 }
-func (s *Service) StartTcpServer() {
+func (s *Service) StartTcpServer(callback func(c *tcp_server.Client, message []byte)) {
+	s.tcpServer.OnNewMessage(callback)
 	go s.tcpServer.Listen()
 }

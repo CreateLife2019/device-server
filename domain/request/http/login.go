@@ -1,4 +1,4 @@
-package request
+package http
 
 type LoginRequest struct {
 	Account    string `form:"account" json:"account" binding:"required"`
