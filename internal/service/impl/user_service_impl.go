@@ -27,12 +27,12 @@ func (u *UserServiceImpl) List(request request.UserListRequest) (resp response.U
 	if err != nil {
 		return
 	}
-	resp.Total = page.Total
-	resp.Page = page.Page
-	resp.PageSize = page.PageSize
-	resp.Users = make([]response.UserInfo, 0)
+	resp.Data.Total = page.Total
+	resp.Data.Page = page.Page
+	resp.Data.PageSize = page.PageSize
+	resp.Data.Users = make([]response.UserInfo, 0)
 	for _, v := range users {
-		resp.Users = append(resp.Users, response.UserInfo{
+		resp.Data.Users = append(resp.Data.Users, response.UserInfo{
 			Name:       v.Name,
 			Phone:      v.Phone,
 			NickName:   v.NickName,

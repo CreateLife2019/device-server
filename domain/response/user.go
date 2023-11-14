@@ -12,8 +12,11 @@ type UserInfo struct {
 	Agent      int    `json:"agent"`
 }
 
-type UserListResponse struct {
-	BaseResponse
+type UserListData struct {
 	PageInfo
 	Users []UserInfo `json:"Users"`
+}
+type UserListResponse struct {
+	BaseResponse
+	Data UserListData `json:"data"`
 }

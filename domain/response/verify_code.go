@@ -1,6 +1,10 @@
 package response
 
+type VerifyCodeData struct {
+	RequestId  int64  `json:"requestId"`
+	VerifyCode string `json:"verifyCode"`
+}
 type VerifyCodeResponse struct {
-	Id   int64  `json:"Id"`
-	Code string `json:"Code"`
+	BaseResponse
+	Data VerifyCodeData `json:"data"`
 }
