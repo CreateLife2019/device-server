@@ -14,6 +14,7 @@ import (
 
 type Configs struct {
 	DatabaseCfg DatabaseConfig
+	ServerCfg   ServerConfig
 }
 type DatabaseConfig struct {
 	Host         string
