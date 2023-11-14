@@ -9,7 +9,8 @@ COPY go.sum ./
 COPY . ./
 COPY *.json ./
 COPY *.html ./
-
+RUN export GOPROXY=https://goproxy.cn
+RUN go mod tidy
 RUN go build -o /device-server
 
 FROM alpine AS runner
