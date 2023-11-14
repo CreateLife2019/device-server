@@ -15,7 +15,7 @@ import (
 
 func Register(e *gin.Engine) {
 	e.POST("/login", login)
-	e.POST("/verify-code", verifyCode)
+	e.POST("/login/verify-code", verifyCode)
 }
 
 // 登陆
