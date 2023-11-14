@@ -32,7 +32,8 @@ type RedisConfig struct {
 	PoolSize int
 }
 type ServerConfig struct {
-	Port int
+	Port    int
+	TcpPort int
 }
 
 var (

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/device-server/controller"
 	"github.com/device-server/handler/log"
 	"github.com/device-server/handler/login"
 	"github.com/device-server/handler/user"
@@ -28,4 +29,5 @@ func Register(e *gin.Engine) {
 	user.Register(e)
 	log.Register(e)
 	login.Register(e)
+	controller.GetInstance().StartTcpServer()
 }
