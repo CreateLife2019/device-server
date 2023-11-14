@@ -24,3 +24,6 @@ func (v *VerifyCodeImpl) Get(db *gorm.DB, scopes ...func(*gorm.DB) *gorm.DB) (ac
 	err = db.First(&model).Error
 	return
 }
+func (v *VerifyCodeImpl) SoftDelete(db *gorm.DB, id int64) error {
+	return db.Where("f_request_id = ?", id).Delete(&entity.VerifyCode{}).Error
+}

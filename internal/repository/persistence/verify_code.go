@@ -8,4 +8,5 @@ import (
 type VerifyCodeIer interface {
 	BatchSave(db *gorm.DB, admins []*entity.VerifyCode) error
 	Get(db *gorm.DB, scopes ...func(*gorm.DB) *gorm.DB) (account *entity.VerifyCode, err error)
+	SoftDelete(db *gorm.DB, id int64) error
 }

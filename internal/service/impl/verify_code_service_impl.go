@@ -22,6 +22,7 @@ func (v *VerifyCodeServiceImpl) Check(requestId int64, code string) (err error) 
 	if err != nil {
 		return
 	}
+	err = v.vIer.SoftDelete(v.db, requestId)
 	return
 }
 func (v *VerifyCodeServiceImpl) Save(requestId int64, code string) (err error) {
@@ -29,4 +30,7 @@ func (v *VerifyCodeServiceImpl) Save(requestId int64, code string) (err error) {
 		RequestId:  requestId,
 		VerifyCode: code,
 	}})
+}
+func (v *VerifyCodeServiceImpl) Delete(requestId int64) (err error) {
+	return v.vIer.SoftDelete(v.db, requestId)
 }
