@@ -3,8 +3,8 @@ package global
 import (
 	"fmt"
 	"github.com/device-server/internal/repository/entity"
-	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/redis/go-redis/v9"
 	_ "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
