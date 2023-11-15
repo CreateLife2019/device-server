@@ -23,7 +23,7 @@ func (a *AccountImpl) Update(tx *gorm.DB, in *entity.Account, scopes ...func(db 
 	err = tx.Model(&entity.Account{}).Scopes(scopes...).Updates(&in).Error
 	return
 }
-func (u *AccountImpl) SearchAccount(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (users []*entity.Account, err error) {
+func (a *AccountImpl) SearchAccount(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (users []*entity.Account, err error) {
 	db = db.Model(&entity.Account{}).Scopes(scopes...)
 	if page != nil {
 		db.Count(&page.Total)
@@ -32,7 +32,7 @@ func (u *AccountImpl) SearchAccount(db *gorm.DB, page *entity.Page, scopes ...fu
 	err = db.Order("f_created_at desc").Find(&users).Error
 	return
 }
-func (u *AccountImpl) Delete(db *gorm.DB, in *entity.Account) (err error) {
+func (a *AccountImpl) Delete(db *gorm.DB, in *entity.Account) (err error) {
 	err = db.Model(&entity.Account{}).Unscoped().Where(&in).Delete(&in).Error
 	return err
 }

@@ -56,7 +56,7 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 	}
 	return
 }
-func (u *UserServiceImpl) Login(request tcpRequest.LoginRequest) (resp []byte) {
+func (u *UserServiceImpl) Login(request tcpRequest.LoginRequest) (resp tcp.TcpResponseProtocol, err error) {
 	user := &entity.User{
 		Name:     request.UserName,
 		Phone:    request.Phone,
@@ -95,15 +95,41 @@ func (u *UserServiceImpl) Login(request tcpRequest.LoginRequest) (resp []byte) {
 		tcpResp.UserId = userExtend.UserId
 		return err
 	})
-
-	if err != nil {
-		return tcpResp.BuildFailed("500")
-	} else {
-		return tcpResp.BuildSuc()
-	}
+	resp = &tcpResp
+	return
 }
-func (u *UserServiceImpl) Heartbeat(request tcpRequest.HeartbeatRequest) (resp []byte) {
-
+func (u *UserServiceImpl) Heartbeat(request tcpRequest.HeartbeatRequest) (resp tcp.TcpResponseProtocol, err error) {
+	tcpResp := tcp.HeartbeatResponse{}
+	user, err := u.user.Get(u.db, filter.WithPhone(request.Phone))
+	if err != nil {
+		return
+	} else {
+		tcpResp.Phone = request.Phone
+		err = u.user.UpdateUserExtend(u.db, &entity.UserExtend{
+			HeartbeatTime: time.Now(),
+		}, filter.WithUserId(user.Id))
+		if err != nil {
+			return
+		}
+	}
+	resp = &tcpResp
+	return
+}
+func (u *UserServiceImpl) Offline(request tcpRequest.OfflineRequest) (resp tcp.TcpResponseProtocol, err error) {
+	tcpResp := tcp.OfflineResponse{}
+	user, err := u.user.Get(u.db, filter.WithPhone(request.Phone))
+	if err != nil {
+		return
+	} else {
+		tcpResp.Phone = request.Phone
+		err = u.user.UpdateUserExtend(u.db, &entity.UserExtend{
+			Online: 2,
+		}, filter.WithUserId(user.Id))
+		if err != nil {
+			return
+		}
+	}
+	resp = &tcpResp
 	return
 }
 func (u *UserServiceImpl) checkHeartbeat() {

@@ -20,6 +20,7 @@ func Onmessage(c *tcp_server.Client, message []byte) {
 	}
 }
 func handleMessage(c *tcp_server.Client, message []byte, head *base.Head) {
+	var sendBytes = make([]byte, 0)
 	switch head.RequestType {
 	case constants.TcpLoginType:
 		logReq := tcp.LoginRequest{}
@@ -28,8 +29,13 @@ func handleMessage(c *tcp_server.Client, message []byte, head *base.Head) {
 			logrus.Errorf("收到客户端消息，解析失败:%s", err.Error())
 			return
 		}
-		resp := controller.GetInstance().UserService().Login(logReq)
-		err = c.SendBytes(resp)
+		resp, err := controller.GetInstance().UserService().Login(logReq)
+		if err != nil {
+			sendBytes = resp.BuildFailed("500")
+		} else {
+			sendBytes = resp.BuildSuc()
+		}
+		err = c.SendBytes(sendBytes)
 		if err != nil {
 			logrus.Errorf("收到客户端消息，回复失败:%s", err.Error())
 			return
@@ -41,12 +47,34 @@ func handleMessage(c *tcp_server.Client, message []byte, head *base.Head) {
 			logrus.Errorf("收到客户端消息，解析失败:%s", err.Error())
 			return
 		}
-		resp := controller.GetInstance().UserService().Heartbeat(logReq)
-		err = c.SendBytes(resp)
+		resp, err := controller.GetInstance().UserService().Heartbeat(logReq)
+		if err != nil {
+			sendBytes = resp.BuildFailed("500")
+		} else {
+			sendBytes = resp.BuildSuc()
+		}
+		err = c.SendBytes(sendBytes)
+		if err != nil {
+			logrus.Errorf("收到客户端消息，回复失败:%s", err.Error())
+			return
+		}
+	case constants.TcpOffline:
+		offlineReq := tcp.OfflineRequest{}
+		err := json.Unmarshal(message, &offlineReq)
+		if err != nil {
+			logrus.Errorf("收到客户端消息，解析失败:%s", err.Error())
+			return
+		}
+		resp, err := controller.GetInstance().UserService().Offline(offlineReq)
+		if err != nil {
+			sendBytes = resp.BuildFailed("500")
+		} else {
+			sendBytes = resp.BuildSuc()
+		}
+		err = c.SendBytes(sendBytes)
 		if err != nil {
 			logrus.Errorf("收到客户端消息，回复失败:%s", err.Error())
 			return
 		}
 	}
-
 }

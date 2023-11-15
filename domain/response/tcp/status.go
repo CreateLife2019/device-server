@@ -6,21 +6,20 @@ import (
 	"github.com/device-server/domain/constants"
 )
 
-type HeartbeatResponse struct {
+type OfflineResponse struct {
 	base.Head
-	UserId int64  `json:"userId"`
-	Phone  string `json:"phone"`
+	Phone string `json:"phone"`
 }
 
-func (l *HeartbeatResponse) BuildSuc() []byte {
-	l.Head.RequestType = constants.TcpLoginType
+func (l *OfflineResponse) BuildSuc() []byte {
+	l.Head.RequestType = constants.TcpOffline
 	l.Head.Code = constants.Status200
 	l.Head.Msg = constants.MessageSuc
 	data, _ := json.Marshal(l)
 	return data
 }
 
-func (l *HeartbeatResponse) BuildFailed(code string) []byte {
+func (l *OfflineResponse) BuildFailed(code string) []byte {
 	l.Code = code
 	l.Msg = "请求失败"
 	data, _ := json.Marshal(l)
