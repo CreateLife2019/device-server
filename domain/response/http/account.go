@@ -20,6 +20,7 @@ type AccountInfo struct {
 	Account   string    `json:"account"`
 	LoginTime time.Time `json:"loginTime"`
 	CreatedAt time.Time `json:"createdAt"`
+	Id        int64     `json:"id"`
 }
 type AccountListData struct {
 	base.PageInfo

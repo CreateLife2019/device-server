@@ -125,6 +125,7 @@ func (a *AccountServiceImpl) AccountList(request http.AccountListRequest) (resp 
 			Account:   v.UserName,
 			LoginTime: v.LoginTime,
 			CreatedAt: *v.CreatedAt,
+			Id:        v.Id,
 		})
 	}
 	return

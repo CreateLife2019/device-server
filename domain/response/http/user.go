@@ -3,6 +3,7 @@ package http
 import "github.com/device-server/domain/base"
 
 type UserInfo struct {
+	Id         int64  `json:"id,string"`
 	Name       string `json:"name"`
 	Phone      string `json:"phone"`
 	NickName   string `json:"nickName"` // 用户名

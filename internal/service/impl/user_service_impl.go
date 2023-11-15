@@ -51,6 +51,7 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 			Ip:         "",
 			Online:     0,
 			Agent:      0,
+			Id:         v.Id,
 		})
 	}
 	return
