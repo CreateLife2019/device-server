@@ -9,4 +9,5 @@ import (
 type UserService interface {
 	List(request http.UserListRequest) (resp http2.UserListResponse, err error)
 	Login(request tcpRequest.LoginRequest) (resp []byte)
+	Heartbeat(request tcpRequest.HeartbeatRequest) (resp []byte)
 }

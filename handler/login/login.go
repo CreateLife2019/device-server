@@ -29,7 +29,7 @@ func login(c *gin.Context) {
 		}})
 	} else {
 		var resp = http3.LoginResponse{}
-		resp, err = controller.GetInstance().LoginService().Login(loginReq)
+		resp, err = controller.GetInstance().AccountService().Login(loginReq)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, http3.LoginResponse{BaseResponse: base.BaseResponse{
 				Code: "500",

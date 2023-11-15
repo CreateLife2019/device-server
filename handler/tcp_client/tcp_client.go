@@ -35,7 +35,18 @@ func handleMessage(c *tcp_server.Client, message []byte, head *base.Head) {
 			return
 		}
 	case constants.TcpHeartbeat:
-
+		logReq := tcp.HeartbeatRequest{}
+		err := json.Unmarshal(message, &logReq)
+		if err != nil {
+			logrus.Errorf("收到客户端消息，解析失败:%s", err.Error())
+			return
+		}
+		resp := controller.GetInstance().UserService().Heartbeat(logReq)
+		err = c.SendBytes(resp)
+		if err != nil {
+			logrus.Errorf("收到客户端消息，回复失败:%s", err.Error())
+			return
+		}
 	}
 
 }

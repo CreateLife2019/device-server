@@ -21,7 +21,10 @@ type UserServiceImpl struct {
 }
 
 func NewUserService(db *gorm.DB) *UserServiceImpl {
-	return &UserServiceImpl{db: db, user: &impl.UserIerImpl{}}
+
+	s := &UserServiceImpl{db: db, user: &impl.UserIerImpl{}}
+	s.checkHeartbeat()
+	return s
 }
 func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserListResponse, err error) {
 	users := make([]*entity.User, 0)
@@ -65,12 +68,13 @@ func (u *UserServiceImpl) Login(request tcpRequest.LoginRequest) (resp []byte) {
 		loginTime = time.Now()
 	}
 	userExtend := entity.UserExtend{
-		Base:       entity.Base{},
-		Online:     1,
-		ClientIp:   request.ClientIP,
-		LoginTime:  loginTime,
-		AppVersion: request.AppVersion,
-		ProxyType:  request.ProxyType,
+		Base:          entity.Base{},
+		Online:        1,
+		ClientIp:      request.ClientIP,
+		LoginTime:     loginTime,
+		HeartbeatTime: loginTime,
+		AppVersion:    request.AppVersion,
+		ProxyType:     request.ProxyType,
 	}
 
 	err = u.db.Transaction(func(tx *gorm.DB) error {
@@ -87,6 +91,7 @@ func (u *UserServiceImpl) Login(request tcpRequest.LoginRequest) (resp []byte) {
 		if err != nil {
 			return err
 		}
+		tcpResp.UserId = userExtend.UserId
 		return err
 	})
 
@@ -95,4 +100,15 @@ func (u *UserServiceImpl) Login(request tcpRequest.LoginRequest) (resp []byte) {
 	} else {
 		return tcpResp.BuildSuc()
 	}
+}
+func (u *UserServiceImpl) Heartbeat(request tcpRequest.HeartbeatRequest) (resp []byte) {
+
+	return
+}
+func (u *UserServiceImpl) checkHeartbeat() {
+	go func() {
+		//for {
+		//
+		//}
+	}()
 }

@@ -4,10 +4,11 @@ import (
 	"github.com/device-server/domain/base"
 )
 
-type AdminIdData struct {
-	Id int64 `json:"id"`
+type AccountData struct {
+	AccountId int64 `json:"accountId"`
 }
 type LoginResponse struct {
 	base.BaseResponse
-	Data AdminIdData `json:"data"`
+	Data  AccountData `json:"data"`
+	Token string      `json:"token"`
 }

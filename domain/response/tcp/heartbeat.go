@@ -6,12 +6,12 @@ import (
 	"github.com/device-server/domain/constants"
 )
 
-type LoginResponse struct {
+type HeartbeatResponse struct {
 	base.Head
 	UserId int64 `json:"userId"`
 }
 
-func (l *LoginResponse) BuildSuc() []byte {
+func (l *HeartbeatResponse) BuildSuc() []byte {
 	l.Head.RequestType = constants.TcpLoginType
 	l.Head.Code = constants.Status200
 	l.Head.Msg = constants.MessageSuc
@@ -19,7 +19,7 @@ func (l *LoginResponse) BuildSuc() []byte {
 	return data
 }
 
-func (l *LoginResponse) BuildFailed(code string) []byte {
+func (l *HeartbeatResponse) BuildFailed(code string) []byte {
 	l.Code = code
 	l.Msg = "请求失败"
 	data, _ := json.Marshal(l)
