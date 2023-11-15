@@ -27,6 +27,7 @@ func (c *Client) listen() {
 		message := make([]byte, 1024)
 		n, err := c.conn.Read(message)
 		if err != nil {
+			c.Server.onClientConnectionClosed(c, err)
 			break
 		}
 		logrus.Infof("read count:%d", n)

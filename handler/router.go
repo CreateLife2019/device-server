@@ -32,5 +32,5 @@ func Register(e *gin.Engine) {
 	log.Register(e)
 	account.Register(e)
 	login.Register(e)
-	controller.GetInstance().StartTcpServer(tcp_client.Onmessage)
+	controller.GetInstance().StartTcpServer(tcp_client.Onmessage, tcp_client.OnConnectionClose)
 }

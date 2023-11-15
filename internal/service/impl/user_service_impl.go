@@ -6,6 +6,7 @@ import (
 	tcpRequest "github.com/device-server/domain/request/tcp"
 	http2 "github.com/device-server/domain/response/http"
 	"github.com/device-server/domain/response/tcp"
+	"github.com/device-server/global"
 	"github.com/device-server/internal/repository/entity"
 	"github.com/device-server/internal/repository/filter"
 	"github.com/device-server/internal/repository/persistence"
@@ -16,8 +17,9 @@ import (
 )
 
 type UserServiceImpl struct {
-	db   *gorm.DB
-	user persistence.UserIer
+	db       *gorm.DB
+	user     persistence.UserIer
+	stopChan chan struct{}
 }
 
 func NewUserService(db *gorm.DB) *UserServiceImpl {
@@ -134,8 +136,28 @@ func (u *UserServiceImpl) Offline(request tcpRequest.OfflineRequest) (resp tcp.T
 }
 func (u *UserServiceImpl) checkHeartbeat() {
 	go func() {
-		//for {
-		//
-		//}
+
+		ticker := time.NewTicker(time.Duration(global.Cfg.ServerCfg.HeartbeatTime))
+		defer func() {
+			ticker.Stop()
+		}()
+		for {
+			select {
+			case <-u.stopChan:
+				return
+			case <-ticker.C:
+				logrus.Infof("检测客户端上线下线")
+				users, err := u.user.SearchUserExtend(u.db, nil, filter.WithOnline())
+				if err != nil {
+					continue
+				}
+				for _, v := range users {
+					if time.Now().Sub(v.HeartbeatTime).Seconds() > float64(global.Cfg.ServerCfg.HeartbeatTime/1000000000) {
+						logrus.Infof("未检测到心跳:%v", *v)
+						//
+					}
+				}
+			}
+		}
 	}()
 }

@@ -45,3 +45,12 @@ func (u *UserIerImpl) Update(tx *gorm.DB, in *entity.User, scopes ...func(db *go
 	err = tx.Model(&entity.User{}).Scopes(scopes...).Updates(&in).Error
 	return
 }
+func (u *UserIerImpl) SearchUserExtend(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (users []*entity.UserExtend, err error) {
+	db = db.Model(&entity.UserExtend{}).Scopes(scopes...)
+	if page != nil {
+		db.Count(&page.Total)
+		db = db.Scopes(filter.Page(page))
+	}
+	err = db.Order("f_created_at desc").Find(&users).Error
+	return
+}

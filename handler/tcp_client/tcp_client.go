@@ -8,7 +8,31 @@ import (
 	"github.com/device-server/domain/request/tcp"
 	"github.com/device-server/internal/tcp_server"
 	"github.com/sirupsen/logrus"
+	"sync"
 )
+
+var clientMap = map[string]*tcp_server.Client{}
+var lock sync.Locker = &sync.Mutex{}
+
+func addClient(phone string, c *tcp_server.Client) {
+	lock.Lock()
+	defer lock.Unlock()
+	clientMap[phone] = c
+}
+func deleteClient(c *tcp_server.Client) {
+	lock.Lock()
+	defer lock.Unlock()
+	phone := ""
+	for key, v := range clientMap {
+		if v.Conn() == c.Conn() {
+			phone = key
+			break
+		}
+	}
+	if phone != "" {
+		delete(clientMap, phone)
+	}
+}
 
 func Onmessage(c *tcp_server.Client, message []byte) {
 	head := base.Head{}
@@ -18,6 +42,9 @@ func Onmessage(c *tcp_server.Client, message []byte) {
 	} else {
 		handleMessage(c, message, &head)
 	}
+}
+func OnConnectionClose(c *tcp_server.Client, err error) {
+	deleteClient(c)
 }
 func handleMessage(c *tcp_server.Client, message []byte, head *base.Head) {
 	var sendBytes = make([]byte, 0)
@@ -40,6 +67,7 @@ func handleMessage(c *tcp_server.Client, message []byte, head *base.Head) {
 			logrus.Errorf("收到客户端消息，回复失败:%s", err.Error())
 			return
 		}
+		addClient(logReq.Phone, c)
 	case constants.TcpHeartbeat:
 		logReq := tcp.HeartbeatRequest{}
 		err := json.Unmarshal(message, &logReq)

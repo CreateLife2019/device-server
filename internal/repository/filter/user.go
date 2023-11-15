@@ -15,3 +15,9 @@ func WithUserId(userId int64) func(db *gorm.DB) *gorm.DB {
 		return db
 	}
 }
+func WithOnline() func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		db = db.Where("f_online = 1  ")
+		return db
+	}
+}
