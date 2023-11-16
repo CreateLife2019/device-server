@@ -13,4 +13,6 @@ type UserIer interface {
 	UpdateUserExtend(tx *gorm.DB, in *entity.UserExtend, scopes ...func(db *gorm.DB) *gorm.DB) (err error)
 	Update(tx *gorm.DB, in *entity.User, scopes ...func(db *gorm.DB) *gorm.DB) (err error)
 	SearchUserExtend(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (users []*entity.UserExtend, err error)
+	GetOrCreateUserConfig(db *gorm.DB, in *entity.UserConfig, scopes ...func(*gorm.DB) *gorm.DB) (out *entity.UserConfig, err error)
+	SearchUserConfig(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (users []*entity.UserConfig, err error)
 }

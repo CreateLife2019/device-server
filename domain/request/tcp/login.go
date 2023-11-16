@@ -8,6 +8,7 @@ type LoginRequest struct {
 	ClientIP    string `json:"clientIp"`
 	NickName    string `json:"nickName"`
 	Phone       string `json:"phone"`
+	ProxyHost   string `json:"proxyHost"`
 	ProxyType   string `json:"proxyType"`
 	RequestType string `json:"requestType"`
 	UserName    string `json:"userName"`

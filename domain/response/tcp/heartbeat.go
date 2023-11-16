@@ -13,7 +13,7 @@ type HeartbeatResponse struct {
 }
 
 func (l *HeartbeatResponse) BuildSuc() []byte {
-	l.Head.RequestType = constants.TcpLoginType
+	l.Head.RequestType = constants.TcpHeartbeat
 	l.Head.Code = constants.Status200
 	l.Head.Msg = constants.MessageSuc
 	data, _ := json.Marshal(l)

@@ -21,3 +21,15 @@ func WithOnline() func(db *gorm.DB) *gorm.DB {
 		return db
 	}
 }
+func WithId(userId int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		db = db.Where("f_id = ?  ", userId)
+		return db
+	}
+}
+func WithInId(userId []int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		db = db.Where("f_id in ?  ", userId)
+		return db
+	}
+}

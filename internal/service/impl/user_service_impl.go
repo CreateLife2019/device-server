@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"github.com/device-server/domain/base"
 	"github.com/device-server/domain/constants"
 	"github.com/device-server/domain/request/http"
 	tcpRequest "github.com/device-server/domain/request/tcp"
@@ -132,6 +133,66 @@ func (u *UserServiceImpl) Offline(request tcpRequest.OfflineRequest) (resp tcp.T
 		}
 	}
 	resp = &tcpResp
+	return
+}
+func (u *UserServiceImpl) Get(userId int64) (user *entity.User, err error) {
+	return u.user.Get(u.db, filter.WithId(userId))
+}
+func (u *UserServiceImpl) SetProxy(request http.ProxyRequest) (resp http2.SetProxyResponse, err error) {
+	resp = http2.SetProxyResponse{BaseResponse: base.BaseResponse{Code: constants.Status200, Msg: constants.MessageSuc}}
+	_, err = u.user.Get(u.db, filter.WithId(request.UserId))
+	if err != nil {
+		resp.Code = constants.Status500
+		resp.Msg = constants.MessageFailedNotFound
+		return
+	}
+	userConfig := &entity.UserConfig{}
+	userConfig.ReadProxy(request)
+	_, err = u.user.GetOrCreateUserConfig(u.db, userConfig, filter.WithUserId(request.UserId))
+	if err != nil {
+		resp.Code = constants.Status500
+		resp.Msg = constants.MessageFailedNotFound
+		return
+	}
+	return
+}
+
+func (u *UserServiceImpl) ListUserConfig(request http.UserConfigListRequest) (resp http2.UserConfigInfoListResponse, err error) {
+	configs := make([]*entity.UserConfig, 0)
+	page := &entity.Page{
+		Page:     request.Page,
+		PageSize: request.PageSize,
+	}
+	configs, err = u.user.SearchUserConfig(u.db, page)
+	if err != nil {
+		resp.Code = constants.Status500
+		resp.Msg = constants.MessageFailedNotFound
+		return
+	}
+	resp.Data.Total = page.Total
+	resp.Data.Page = page.Page
+	resp.Data.PageSize = page.PageSize
+	resp.Data.UserConfigs = make([]http2.UserConfigInfo, 0)
+	userIds := make([]int64, 0)
+	for _, v := range configs {
+		userIds = append(userIds, v.UserId)
+	}
+	var users []*entity.User
+	users, err = u.user.SearchUser(u.db, nil, filter.WithInId(userIds))
+	if err != nil {
+		resp.Code = constants.Status500
+		resp.Msg = constants.MessageFailedNotFound
+		return
+	}
+	userMap := map[int64]*entity.User{}
+	for _, v := range users {
+		userMap[v.Id] = v
+	}
+	for _, v := range configs {
+		item := v.ToResponse()
+		item.UserName = userMap[v.UserId].Name
+		resp.Data.UserConfigs = append(resp.Data.UserConfigs, item)
+	}
 	return
 }
 func (u *UserServiceImpl) checkHeartbeat() {

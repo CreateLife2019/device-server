@@ -1,6 +1,9 @@
 package http
 
-import "github.com/device-server/domain/base"
+import (
+	"github.com/device-server/domain/base"
+	"time"
+)
 
 type UserInfo struct {
 	Id         int64  `json:"id,string"`
@@ -22,4 +25,30 @@ type UserListData struct {
 type UserListResponse struct {
 	base.BaseResponse
 	Data UserListData `json:"data"`
+}
+
+type SetProxyResponse struct {
+	base.BaseResponse
+}
+
+type ProxyInfo struct {
+	ProxyHost   string    `json:"proxyHost"`
+	ProxyPort   int       `json:"proxyPort"`
+	ProxySecret string    `json:"proxySecret"`
+	SetTime     time.Time `json:"setTime"`
+}
+type UserConfigInfo struct {
+	Id       int64  `json:"id,string"`
+	UserId   int64  `json:"userId"`
+	UserName string `json:"userName"`
+
+	Proxies []ProxyInfo `json:"proxies"`
+}
+type UserConfigInfoListData struct {
+	base.PageInfo
+	UserConfigs []UserConfigInfo `json:"userConfigs"`
+}
+type UserConfigInfoListResponse struct {
+	base.BaseResponse
+	Data UserConfigInfoListData `json:"data"`
 }

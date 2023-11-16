@@ -54,3 +54,30 @@ func (u *UserIerImpl) SearchUserExtend(db *gorm.DB, page *entity.Page, scopes ..
 	err = db.Order("f_created_at desc").Find(&users).Error
 	return
 }
+func (u *UserIerImpl) GetUserConfig(db *gorm.DB, scopes ...func(*gorm.DB) *gorm.DB) (account *entity.UserConfig, err error) {
+	account = &entity.UserConfig{}
+	db = db.Model(&entity.UserConfig{}).Scopes(scopes...)
+	err = db.First(account).Error
+	return
+}
+func (u *UserIerImpl) GetOrCreateUserConfig(db *gorm.DB, in *entity.UserConfig, scopes ...func(*gorm.DB) *gorm.DB) (out *entity.UserConfig, err error) {
+	out, err = u.GetUserConfig(db, scopes...)
+	if err != nil && err == gorm.ErrRecordNotFound {
+		in.Id = 0
+		if err = db.Create(&in).Error; err != nil {
+			return
+		}
+		out = in
+		return
+	}
+	return
+}
+func (u *UserIerImpl) SearchUserConfig(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (users []*entity.UserConfig, err error) {
+	db = db.Model(&entity.UserConfig{}).Scopes(scopes...)
+	if page != nil {
+		db.Count(&page.Total)
+		db = db.Scopes(filter.Page(page))
+	}
+	err = db.Order("f_created_at desc").Find(&users).Error
+	return
+}

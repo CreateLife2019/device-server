@@ -5,8 +5,18 @@ import "github.com/device-server/domain/base"
 type UserListRequest struct {
 	base.PageInfo
 }
+type UserConfigListRequest struct {
+	base.PageInfo
+}
+type ProxyInfo struct {
+	ProxyHost   string `json:"proxyHost"`
+	ProxyPort   int    `json:"proxyPort"`
+	ProxySecret string `json:"proxySecret"`
+}
 
 // 增加用户代理
-type AgentRequest struct {
-	UserId int64 `json:"UserId"`
+type ProxyRequest struct {
+	UserId      int64       `json:"userId"` // 用户列表返回，唯一
+	Proxies     []ProxyInfo `json:"proxies"`
+	Immediately bool        `json:"immediately"` //是否立即生效
 }
