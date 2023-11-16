@@ -14,18 +14,20 @@ import (
 	"github.com/device-server/internal/repository/persistence/impl"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"math/rand"
 	"time"
 )
 
 type UserServiceImpl struct {
 	db       *gorm.DB
 	user     persistence.UserIer
+	proxy    persistence.ProxyIer
 	stopChan chan struct{}
 }
 
 func NewUserService(db *gorm.DB) *UserServiceImpl {
 
-	s := &UserServiceImpl{db: db, user: &impl.UserIerImpl{}}
+	s := &UserServiceImpl{db: db, user: &impl.UserIerImpl{}, proxy: &impl.ProxyImpl{}}
 	s.checkHeartbeat()
 	return s
 }
@@ -140,7 +142,7 @@ func (u *UserServiceImpl) Offline(request tcpRequest.OfflineRequest) (resp tcp.T
 func (u *UserServiceImpl) Get(userId int64) (user *entity.User, err error) {
 	return u.user.Get(u.db, filter.WithId(userId))
 }
-func (u *UserServiceImpl) SetProxy(request http.ProxyRequest) (resp http2.SetProxyResponse, err error) {
+func (u *UserServiceImpl) SetProxy(request http.ProxyRequest) (selectProxy *entity.Proxy, resp http2.SetProxyResponse, err error) {
 	resp = http2.SetProxyResponse{BaseResponse: base.BaseResponse{Code: constants.Status200, Msg: constants.MessageSuc}}
 	_, err = u.user.Get(u.db, filter.WithId(request.UserId))
 	if err != nil {
@@ -148,8 +150,27 @@ func (u *UserServiceImpl) SetProxy(request http.ProxyRequest) (resp http2.SetPro
 		resp.Msg = constants.MessageFailedNotFound
 		return
 	}
+	var proxies []*entity.Proxy
+	proxies, err = u.proxy.SearchProxy(u.db, nil)
+	if err != nil {
+		resp.Code = constants.Status500
+		resp.Msg = constants.MessageFailedNoProxy
+		return
+	}
+	if len(proxies) == 0 {
+		resp.Code = constants.Status500
+		resp.Msg = constants.MessageFailedNoProxy
+		return
+	}
+	num := 0
+	if len(proxies) != 1 {
+		num = rand.Intn(len(proxies) - 1)
+	}
+	selectCfg := proxies[num]
 	userConfig := &entity.UserConfig{}
-	userConfig.ReadProxy(request)
+	selectCfg.Time = time.Now()
+	userConfig.Proxies = append(userConfig.Proxies, *selectCfg)
+	userConfig.UserId = request.UserId
 	_, err = u.user.GetOrCreateUserConfig(u.db, userConfig, filter.WithUserId(request.UserId))
 	if err != nil {
 		resp.Code = constants.Status500

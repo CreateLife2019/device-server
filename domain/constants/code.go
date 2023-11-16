@@ -9,9 +9,12 @@ const (
 	MessageFailedSamePassword    = "新旧密码不能相同"
 	MessageFailedNotFound        = "未找到该账号"
 	MessageFailedWrongPassword   = "旧密码错误"
+	MessageFailedNoProxy         = "无代理信息"
+	MessageFailedServer          = "服务器错误"
 )
 
 const (
 	Status200 = "200"
 	Status500 = "500"
+	Status400 = "400"
 )

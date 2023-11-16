@@ -52,7 +52,8 @@ func setProxy(c *gin.Context) {
 		}})
 	} else {
 		var resp http3.SetProxyResponse
-		resp, err = controller.GetInstance().UserService().SetProxy(proxyRequest)
+		var selectProxy *entity.Proxy
+		selectProxy, resp, err = controller.GetInstance().UserService().SetProxy(proxyRequest)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, http3.SetProxyResponse{BaseResponse: base.BaseResponse{
 				Code: "400",
@@ -72,7 +73,11 @@ func setProxy(c *gin.Context) {
 				proxyReq := tcp.ProxyRequest{
 					RequestType: constants.TcpSetProxy,
 				}
-				proxyReq.HttpToTcp(proxyRequest)
+				proxyReq.ProxyInfo = append(proxyReq.ProxyInfo, tcp.ProxyInfo{
+					ProxyHost:   selectProxy.Host,
+					ProxyPort:   selectProxy.Port,
+					ProxySecret: selectProxy.Secret,
+				})
 				tcp_client.SendMessage(user.Phone, &proxyReq)
 			}
 

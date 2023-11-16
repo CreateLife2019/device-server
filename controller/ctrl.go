@@ -14,6 +14,7 @@ type Service struct {
 	user       service.UserService
 	verifyCode service.VerifyCodeService
 	tcpServer  *tcp_server.Server
+	proxy      service.ProxyService
 }
 
 var instance *Service
@@ -21,7 +22,11 @@ var once sync.Once
 
 func GetInstance() *Service {
 	once.Do(func() {
-		instance = &Service{verifyCode: impl.NewUserVerifyCodeService(global.Db), login: impl.NewAccountService(global.Db), user: impl.NewUserService(global.Db), tcpServer: tcp_server.New(fmt.Sprintf("0.0.0.0:%d", global.Cfg.ServerCfg.TcpPort))}
+		instance = &Service{verifyCode: impl.NewUserVerifyCodeService(global.Db),
+			login:     impl.NewAccountService(global.Db),
+			proxy:     impl.NewProxyService(global.Db),
+			user:      impl.NewUserService(global.Db),
+			tcpServer: tcp_server.New(fmt.Sprintf("0.0.0.0:%d", global.Cfg.ServerCfg.TcpPort))}
 	})
 	return instance
 }
@@ -33,6 +38,9 @@ func (s *Service) UserService() service.UserService {
 }
 func (s *Service) VerifyCodeService() service.VerifyCodeService {
 	return s.verifyCode
+}
+func (s *Service) ProxyService() service.ProxyService {
+	return s.proxy
 }
 func (s *Service) StartTcpServer(msgCallback func(c *tcp_server.Client, message []byte), closeCallback func(c *tcp_server.Client, err error)) {
 	s.tcpServer.OnNewMessage(msgCallback)

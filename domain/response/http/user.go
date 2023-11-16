@@ -2,7 +2,6 @@ package http
 
 import (
 	"github.com/device-server/domain/base"
-	"time"
 )
 
 type UserInfo struct {
@@ -35,12 +34,6 @@ type SendProxyResponse struct {
 	base.BaseResponse
 }
 
-type ProxyInfo struct {
-	ProxyHost   string    `json:"proxyHost"`
-	ProxyPort   int       `json:"proxyPort"`
-	ProxySecret string    `json:"proxySecret"`
-	SetTime     time.Time `json:"setTime"`
-}
 type UserConfigInfo struct {
 	Id       int64  `json:"id,string"`
 	UserId   int64  `json:"userId"`

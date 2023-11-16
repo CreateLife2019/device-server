@@ -20,13 +20,7 @@ type SessionInfo struct {
 	// 目标id
 	DestId int64 `json:"destId"`
 }
-type Proxy struct {
-	Host    string    `json:"host"`
-	Port    int       `json:"port"`
-	Timeout int       `json:"timeout"`
-	Secret  string    `json:"secret"`
-	Time    time.Time `json:"time"`
-}
+
 type Proxies []Proxy
 type Sessions []SessionInfo
 type UserConfig struct {
@@ -78,15 +72,6 @@ func (p *Sessions) Scan(data interface{}) error {
 	return json.Unmarshal(b, p)
 }
 func (u *UserConfig) ReadProxy(request http.ProxyRequest) {
-	item := Proxy{}
-	for _, v := range request.Proxies {
-		item.Host = v.ProxyHost
-		item.Secret = v.ProxySecret
-		item.Port = v.ProxyPort
-		item.Time = time.Now()
-		u.Proxies = append(u.Proxies, item)
-	}
-	u.UserId = request.UserId
 }
 func (u *UserConfig) ToResponse() http2.UserConfigInfo {
 	resp := http2.UserConfigInfo{

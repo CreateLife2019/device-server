@@ -6,6 +6,7 @@ import (
 	"github.com/device-server/handler/log"
 	"github.com/device-server/handler/login"
 	"github.com/device-server/handler/middleware"
+	"github.com/device-server/handler/proxy"
 	"github.com/device-server/handler/tcp_client"
 	"github.com/device-server/handler/user"
 	"github.com/device-server/handler/web"
@@ -36,6 +37,7 @@ func Register(e *gin.Engine) {
 	login.Register(e)
 	web.Register(e)
 	user.Register(group)
+	proxy.Register(group)
 	log.Register(group)
 	account.Register(group)
 	controller.GetInstance().StartTcpServer(tcp_client.Onmessage, tcp_client.OnConnectionClose)

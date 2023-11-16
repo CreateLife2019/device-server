@@ -16,13 +16,13 @@ type ProxyRequest struct {
 }
 
 func (p *ProxyRequest) HttpToTcp(request http.ProxyRequest) {
-	for _, v := range request.Proxies {
-		p.ProxyInfo = append(p.ProxyInfo, ProxyInfo{
-			ProxyHost:   v.ProxyHost,
-			ProxyPort:   v.ProxyPort,
-			ProxySecret: v.ProxySecret,
-		})
-	}
+	//for _, v := range request.Proxies {
+	//	p.ProxyInfo = append(p.ProxyInfo, ProxyInfo{
+	//		ProxyHost:   v.ProxyHost,
+	//		ProxyPort:   v.ProxyPort,
+	//		ProxySecret: v.ProxySecret,
+	//	})
+	//}
 }
 
 func (p *ProxyRequest) ProtocolType() string {
