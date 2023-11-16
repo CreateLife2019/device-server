@@ -126,5 +126,7 @@ func SendMessage(phone string, req tcpBase.TcpRequestProtocol) {
 			logrus.Errorf("发送给客户端消息失败，:%s", err.Error())
 			return
 		}
+	} else {
+		logrus.Errorf("未找到客户端:%s", phone)
 	}
 }

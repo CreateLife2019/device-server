@@ -185,10 +185,10 @@ func (u *UserServiceImpl) SetProxy(request http.ProxyRequest) (selectProxy *enti
 	if len(proxies) != 1 {
 		num = rand.Intn(len(proxies) - 1)
 	}
-	selectCfg := proxies[num]
+	selectProxy = proxies[num]
 	userConfig := &entity.UserConfig{}
-	selectCfg.Time = time.Now()
-	userConfig.Proxies = append(userConfig.Proxies, *selectCfg)
+	selectProxy.Time = time.Now()
+	userConfig.Proxies = append(userConfig.Proxies, *selectProxy)
 	userConfig.UserId = request.UserId
 	_, err = u.user.GetOrCreateUserConfig(u.db, userConfig, filter.WithUserId(request.UserId))
 	if err != nil {
