@@ -17,4 +17,5 @@ type UserIer interface {
 	SearchUserConfig(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (users []*entity.UserConfig, err error)
 	GetUserConfig(db *gorm.DB, scopes ...func(*gorm.DB) *gorm.DB) (account *entity.UserConfig, err error)
 	UpdateUserConfig(tx *gorm.DB, in *entity.UserConfig, scopes ...func(db *gorm.DB) *gorm.DB) (err error)
+	OfflineUsers(db *gorm.DB, userIds []int64) error
 }

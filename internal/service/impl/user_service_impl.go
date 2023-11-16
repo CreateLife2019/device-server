@@ -15,6 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -45,19 +46,37 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 	resp.Data.Page = page.Page
 	resp.Data.PageSize = page.PageSize
 	resp.Data.Users = make([]http2.UserInfo, 0)
+	userIds := make([]int64, 0)
 	for _, v := range users {
-		resp.Data.Users = append(resp.Data.Users, http2.UserInfo{
-			Name:       v.Name,
-			Phone:      v.Phone,
-			NickName:   v.NickName,
-			Avatar:     v.Avatar,
-			Remark:     v.Remark,
-			DeviceName: "",
-			Ip:         "",
-			Online:     0,
-			Agent:      0,
-			Id:         v.Id,
-		})
+		userIds = append(userIds, v.Id)
+	}
+	userExtens, err := u.user.SearchUserExtend(u.db, nil, filter.WithInUserId(userIds))
+	if err != nil {
+		return
+	}
+	userExtendMap := map[int64]*entity.UserExtend{}
+	for _, v := range userExtens {
+		userExtendMap[v.UserId] = v
+	}
+	for _, v := range users {
+		item := http2.UserInfo{
+			Name:     v.Name,
+			Phone:    v.Phone,
+			NickName: v.NickName,
+			Avatar:   v.Avatar,
+			Remark:   v.Remark,
+			Id:       v.Id,
+		}
+		if find, ok := userExtendMap[v.Id]; ok {
+			item.Ip = find.ClientIp
+			item.Online = find.Online
+			if strings.ToLower(find.ProxyType) != "none" {
+				item.Agent = 1
+			}
+			item.DeviceName = find.AppVersion
+		}
+		resp.Data.Users = append(resp.Data.Users, item)
+
 	}
 	resp.Code = constants.Status200
 	resp.Msg = constants.MessageSuc
@@ -248,12 +267,22 @@ func (u *UserServiceImpl) checkHeartbeat() {
 				if err != nil {
 					continue
 				}
+				ids := make([]int64, 0)
 				for _, v := range users {
 					if time.Now().Sub(v.HeartbeatTime).Seconds() > float64(global.Cfg.ServerCfg.HeartbeatTime/1000000000) {
 						logrus.Infof("未检测到心跳:%v", *v)
 						//
+						ids = append(ids, v.UserId)
 					}
 				}
+				if len(ids) != 0 {
+					err = u.user.OfflineUsers(u.db, ids)
+					if err != nil {
+						logrus.Errorf("更新用户状态失败:%v", ids)
+						continue
+					}
+				}
+
 			}
 		}
 	}()

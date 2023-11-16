@@ -85,3 +85,7 @@ func (u *UserIerImpl) SearchUserConfig(db *gorm.DB, page *entity.Page, scopes ..
 	err = db.Order("f_created_at desc").Find(&users).Error
 	return
 }
+
+func (u *UserIerImpl) OfflineUsers(db *gorm.DB, userIds []int64) error {
+	return db.Model(&entity.UserExtend{}).Where("f_id in ?", userIds).Update("f_online", 2).Error
+}

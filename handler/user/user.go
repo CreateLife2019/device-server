@@ -34,7 +34,7 @@ func userList(c *gin.Context) {
 		resp, err = controller.GetInstance().UserService().List(userListReq)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, http3.UserListResponse{BaseResponse: base.BaseResponse{
-				Code: "400",
+				Code: constants.Status500,
 				Msg:  err.Error(),
 			}})
 		} else {

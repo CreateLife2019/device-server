@@ -33,9 +33,15 @@ func WithId(userId int64) func(db *gorm.DB) *gorm.DB {
 		return db
 	}
 }
-func WithInId(userId []int64) func(db *gorm.DB) *gorm.DB {
+func WithInId(ids []int64) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		db = db.Where("f_id in ?  ", userId)
+		db = db.Where("f_id in ?  ", ids)
+		return db
+	}
+}
+func WithInUserId(userId []int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		db = db.Where("f_user_id in ?  ", userId)
 		return db
 	}
 }
