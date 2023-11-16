@@ -45,7 +45,7 @@ func login(c *gin.Context) {
 					Msg:  err.Error(),
 				}})
 			} else {
-				resp.Token = utils.MakeTokenString([]byte(global.Cfg.ServerCfg.Key), global.Cfg.ServerCfg.Algorithm, loginReq.Account, loginReq.Password)
+				resp.Data.Token = utils.MakeTokenString([]byte(global.Cfg.ServerCfg.Key), global.Cfg.ServerCfg.Algorithm, loginReq.Account, loginReq.Password)
 				c.JSON(http.StatusOK, resp)
 			}
 		}

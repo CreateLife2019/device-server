@@ -5,12 +5,12 @@ import (
 )
 
 type AccountData struct {
-	AccountId int64 `json:"accountId"`
+	AccountId int64  `json:"accountId"`
+	Token     string `json:"token"`
 }
 type LoginResponse struct {
 	base.BaseResponse
-	Data  AccountData `json:"data"`
-	Token string      `json:"token"`
+	Data AccountData `json:"data"`
 }
 type LogoutResponse struct {
 	base.BaseResponse
