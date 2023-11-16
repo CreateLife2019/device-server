@@ -35,6 +35,8 @@ type ServerConfig struct {
 	Port          int
 	TcpPort       int
 	HeartbeatTime int64
+	Key           string
+	Algorithm     string
 }
 
 var (

@@ -145,3 +145,10 @@ func (a *AccountServiceImpl) DeleteAccount(accountId int64) (resp http2.DeleteAc
 	resp.Msg = constants.MessageSuc
 	return
 }
+func (a *AccountServiceImpl) CheckUser(userName, password string) bool {
+	_, err := a.account.Get(a.db, filter.WithAccountPassword(userName, password))
+	if err != nil {
+		return false
+	}
+	return true
+}

@@ -11,12 +11,13 @@ import (
 	"github.com/device-server/internal/repository/entity"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
-func Register(e *gin.Engine) {
+func Register(e *gin.RouterGroup) {
 	e.GET("/user", userList)
 	e.POST("/user/config/proxy", setProxy)
-	e.POST("/user/config/send-proxy", sendProxy)
+	e.POST("/user/config/send-proxy/:userId", sendProxy)
 	e.GET("/user/config", userConfigList)
 }
 
@@ -50,7 +51,6 @@ func setProxy(c *gin.Context) {
 			Msg:  err.Error(),
 		}})
 	} else {
-
 		var resp http3.SetProxyResponse
 		resp, err = controller.GetInstance().UserService().SetProxy(proxyRequest)
 		if err != nil {
@@ -71,7 +71,6 @@ func setProxy(c *gin.Context) {
 			if proxyRequest.Immediately {
 				proxyReq := tcp.ProxyRequest{
 					RequestType: constants.TcpSetProxy,
-					ProxyInfo:   nil,
 				}
 				proxyReq.HttpToTcp(proxyRequest)
 				tcp_client.SendMessage(user.Phone, &proxyReq)
@@ -82,7 +81,39 @@ func setProxy(c *gin.Context) {
 	}
 }
 func sendProxy(c *gin.Context) {
-
+	id := c.Param("userId")
+	idLong, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, http3.SendProxyResponse{BaseResponse: base.BaseResponse{
+			Code: "400",
+			Msg:  err.Error(),
+		}})
+		return
+	}
+	var user *entity.User
+	user, err = controller.GetInstance().UserService().Get(idLong)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, http3.SendProxyResponse{BaseResponse: base.BaseResponse{
+			Code: "400",
+			Msg:  err.Error(),
+		}})
+		return
+	}
+	var userConfig *entity.UserConfig
+	userConfig, err = controller.GetInstance().UserService().GetUserConfig(idLong)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, http3.SendProxyResponse{BaseResponse: base.BaseResponse{
+			Code: "400",
+			Msg:  err.Error(),
+		}})
+		return
+	}
+	proxyReq := userConfig.ToTcpProxy()
+	tcp_client.SendMessage(user.Phone, &proxyReq)
+	c.JSON(http.StatusOK, http3.SendProxyResponse{BaseResponse: base.BaseResponse{
+		Code: constants.Status200,
+		Msg:  constants.MessageSuc,
+	}})
 }
 func userConfigList(c *gin.Context) {
 	userListReq := http2.UserConfigListRequest{}

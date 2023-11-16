@@ -11,4 +11,5 @@ type AccountService interface {
 	UpdateAccount(request http.UpdateAccountRequest) (resp http2.UpdateAccountResponse, err error)
 	AccountList(request http.AccountListRequest) (resp http2.AccountListResponse, err error)
 	DeleteAccount(accountId int64) (resp http2.DeleteAccountResponse, err error)
+	CheckUser(userName, password string) bool
 }

@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func Register(e *gin.Engine) {
+func Register(e *gin.RouterGroup) {
 	e.GET("/log/login", loginLogList)
 }
 

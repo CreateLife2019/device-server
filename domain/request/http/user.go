@@ -4,9 +4,11 @@ import "github.com/device-server/domain/base"
 
 type UserListRequest struct {
 	base.PageInfo
+	UserId int64 `form:"userId,omitempty" json:"userId"`
 }
 type UserConfigListRequest struct {
 	base.PageInfo
+	UserId int64 `form:"userId,omitempty" json:"userId"`
 }
 type ProxyInfo struct {
 	ProxyHost   string `json:"proxyHost"`

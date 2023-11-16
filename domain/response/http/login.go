@@ -12,3 +12,6 @@ type LoginResponse struct {
 	Data  AccountData `json:"data"`
 	Token string      `json:"token"`
 }
+type LogoutResponse struct {
+	base.BaseResponse
+}

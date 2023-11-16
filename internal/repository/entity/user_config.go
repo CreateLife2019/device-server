@@ -3,7 +3,9 @@ package entity
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"github.com/device-server/domain/constants"
 	"github.com/device-server/domain/request/http"
+	"github.com/device-server/domain/request/tcp"
 	http2 "github.com/device-server/domain/response/http"
 	"time"
 )
@@ -101,5 +103,19 @@ func (u *UserConfig) ToResponse() http2.UserConfigInfo {
 	}
 
 	return resp
+}
+func (u *UserConfig) ToTcpProxy() tcp.ProxyRequest {
+	resp := tcp.ProxyRequest{
+		RequestType: constants.TcpSetProxy,
+		ProxyInfo:   nil,
+	}
+	for _, v := range u.Proxies {
+		resp.ProxyInfo = append(resp.ProxyInfo, tcp.ProxyInfo{
+			ProxyHost:   v.Host,
+			ProxyPort:   v.Port,
+			ProxySecret: v.Secret,
+		})
+	}
 
+	return resp
 }

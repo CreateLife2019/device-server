@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func Register(e *gin.Engine) {
+func Register(e *gin.RouterGroup) {
 	e.POST("/account", createAccount)
 	e.GET("/account", accountList)
 	e.PUT("/account", updateAccount)

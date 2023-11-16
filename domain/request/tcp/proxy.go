@@ -24,6 +24,7 @@ func (p *ProxyRequest) HttpToTcp(request http.ProxyRequest) {
 		})
 	}
 }
+
 func (p *ProxyRequest) ProtocolType() string {
 	return constants.TcpSetProxy
 }

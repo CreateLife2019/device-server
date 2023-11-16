@@ -5,6 +5,7 @@ import (
 	"github.com/device-server/handler/account"
 	"github.com/device-server/handler/log"
 	"github.com/device-server/handler/login"
+	"github.com/device-server/handler/middleware"
 	"github.com/device-server/handler/tcp_client"
 	"github.com/device-server/handler/user"
 	"github.com/device-server/handler/web"
@@ -27,10 +28,15 @@ func Register(e *gin.Engine) {
 	if gin.Mode() == "debug" {
 		corsSetup(e)
 	}
-	web.Register(e)
-	user.Register(e)
-	log.Register(e)
-	account.Register(e)
+	mid := middleware.Register()
+	group := e.Group("/device")
+	group.POST("/logout", mid.LogoutHandler)
+	group.POST("/refresh-token", mid.RefreshHandler)
+	group.Use(mid.MiddlewareFunc())
 	login.Register(e)
+	web.Register(e)
+	user.Register(group)
+	log.Register(group)
+	account.Register(group)
 	controller.GetInstance().StartTcpServer(tcp_client.Onmessage, tcp_client.OnConnectionClose)
 }

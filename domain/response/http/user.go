@@ -31,6 +31,10 @@ type SetProxyResponse struct {
 	base.BaseResponse
 }
 
+type SendProxyResponse struct {
+	base.BaseResponse
+}
+
 type ProxyInfo struct {
 	ProxyHost   string    `json:"proxyHost"`
 	ProxyPort   int       `json:"proxyPort"`

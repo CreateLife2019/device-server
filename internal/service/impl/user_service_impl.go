@@ -35,7 +35,7 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 		Page:     request.Page,
 		PageSize: request.PageSize,
 	}
-	users, err = u.user.SearchUser(u.db, page)
+	users, err = u.user.SearchUser(u.db, page, filter.WithId(request.UserId))
 	if err != nil {
 		return
 	}
@@ -57,6 +57,8 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 			Id:         v.Id,
 		})
 	}
+	resp.Code = constants.Status200
+	resp.Msg = constants.MessageSuc
 	return
 }
 func (u *UserServiceImpl) Login(request tcpRequest.LoginRequest) (resp tcp.TcpResponseProtocol, err error) {
@@ -154,6 +156,14 @@ func (u *UserServiceImpl) SetProxy(request http.ProxyRequest) (resp http2.SetPro
 		resp.Msg = constants.MessageFailedNotFound
 		return
 	}
+	err = u.user.UpdateUserConfig(u.db, userConfig, filter.WithUserId(request.UserId))
+	if err != nil {
+		resp.Code = constants.Status500
+		resp.Msg = constants.MessageFailedNotFound
+		return
+	}
+	resp.Code = constants.Status200
+	resp.Msg = constants.MessageSuc
 	return
 }
 
@@ -193,7 +203,12 @@ func (u *UserServiceImpl) ListUserConfig(request http.UserConfigListRequest) (re
 		item.UserName = userMap[v.UserId].Name
 		resp.Data.UserConfigs = append(resp.Data.UserConfigs, item)
 	}
+	resp.Code = constants.Status200
+	resp.Msg = constants.MessageSuc
 	return
+}
+func (u *UserServiceImpl) GetUserConfig(userId int64) (user *entity.UserConfig, err error) {
+	return u.user.GetUserConfig(u.db, filter.WithUserId(userId))
 }
 func (u *UserServiceImpl) checkHeartbeat() {
 	go func() {

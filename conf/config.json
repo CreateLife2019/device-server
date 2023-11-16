@@ -17,6 +17,8 @@
   "ServerCfg": {
     "port": 8090,
     "tcpPort": 7090,
-    "heartbeatTime": 120000000000
+    "heartbeatTime": 120000000000,
+    "algorithm":"",
+    "key":"admin"
   }
 }

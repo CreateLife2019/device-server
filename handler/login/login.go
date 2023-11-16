@@ -8,6 +8,8 @@ import (
 	"github.com/device-server/domain/constants"
 	http2 "github.com/device-server/domain/request/http"
 	http3 "github.com/device-server/domain/response/http"
+	"github.com/device-server/global"
+	"github.com/device-server/internal/utils"
 	"github.com/gin-gonic/gin"
 	"math/rand"
 	"net/http"
@@ -15,8 +17,8 @@ import (
 )
 
 func Register(e *gin.Engine) {
-	e.POST("/login", login)
-	e.POST("/login/verify-code", verifyCode)
+	e.POST("/device/login", login)
+	e.POST("/device/login/verify-code", verifyCode)
 }
 
 // 登陆
@@ -43,6 +45,7 @@ func login(c *gin.Context) {
 					Msg:  err.Error(),
 				}})
 			} else {
+				resp.Token = utils.MakeTokenString([]byte(global.Cfg.ServerCfg.Key), global.Cfg.ServerCfg.Algorithm, loginReq.Account, loginReq.Password)
 				c.JSON(http.StatusOK, resp)
 			}
 		}
@@ -76,4 +79,8 @@ func verifyCode(c *gin.Context) {
 			c.JSON(http.StatusOK, resp)
 		}
 	}
+}
+
+func logout(c *gin.Context) {
+	c.JSON(http.StatusOK, http3.LogoutResponse{})
 }

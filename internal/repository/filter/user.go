@@ -11,7 +11,10 @@ func WithPhone(phone string) func(db *gorm.DB) *gorm.DB {
 
 func WithUserId(userId int64) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		db = db.Where("f_user_id = ?  ", userId)
+		if userId != 0 {
+			db = db.Where("f_user_id = ?  ", userId)
+		}
+
 		return db
 	}
 }
@@ -23,7 +26,10 @@ func WithOnline() func(db *gorm.DB) *gorm.DB {
 }
 func WithId(userId int64) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		db = db.Where("f_id = ?  ", userId)
+		if userId != 0 {
+			db = db.Where("f_id = ?  ", userId)
+		}
+
 		return db
 	}
 }

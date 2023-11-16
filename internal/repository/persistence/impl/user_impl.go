@@ -41,6 +41,10 @@ func (u *UserIerImpl) UpdateUserExtend(tx *gorm.DB, in *entity.UserExtend, scope
 	err = tx.Model(&entity.UserExtend{}).Scopes(scopes...).Updates(&in).Error
 	return
 }
+func (u *UserIerImpl) UpdateUserConfig(tx *gorm.DB, in *entity.UserConfig, scopes ...func(db *gorm.DB) *gorm.DB) (err error) {
+	err = tx.Model(&entity.UserConfig{}).Scopes(scopes...).Updates(&in).Error
+	return
+}
 func (u *UserIerImpl) Update(tx *gorm.DB, in *entity.User, scopes ...func(db *gorm.DB) *gorm.DB) (err error) {
 	err = tx.Model(&entity.User{}).Scopes(scopes...).Updates(&in).Error
 	return
