@@ -3,6 +3,7 @@ package impl
 import (
 	"github.com/device-server/internal/repository/entity"
 	"github.com/device-server/internal/repository/filter"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -12,6 +13,14 @@ type ProxyImpl struct {
 func (l *ProxyImpl) Save(db *gorm.DB, in *entity.Proxy) (out *entity.Proxy, err error) {
 	err = db.Model(&entity.Proxy{}).Create(&in).Error
 	return in, err
+}
+func (l *ProxyImpl) BatchSave(db *gorm.DB, in []*entity.Proxy) (err error) {
+	err = db.CreateInBatches(in, 1000).Error
+	if err != nil {
+		logrus.Errorf("批量创建验证码失败:%s", err.Error())
+		return err
+	}
+	return nil
 }
 func (l *ProxyImpl) Update(tx *gorm.DB, in *entity.Proxy, scopes ...func(db *gorm.DB) *gorm.DB) (err error) {
 	err = tx.Model(&entity.Proxy{}).Scopes(scopes...).Updates(&in).Error

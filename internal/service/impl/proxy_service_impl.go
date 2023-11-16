@@ -24,12 +24,16 @@ func NewProxyService(db *gorm.DB) *ProxyServiceImpl {
 }
 
 func (p *ProxyServiceImpl) CreateProxy(request http.CreateProxyRequest) (resp http2.CreateProxyResponse, err error) {
-	var proxy *entity.Proxy = &entity.Proxy{
-		Host:   request.ProxyHost,
-		Port:   request.ProxyPort,
-		Secret: request.ProxySecret,
+	proxies := make([]*entity.Proxy, 0)
+	for _, v := range request.Proxies {
+		item := &entity.Proxy{
+			Host:   v.ProxyHost,
+			Port:   v.ProxyPort,
+			Secret: v.ProxySecret,
+		}
+		proxies = append(proxies, item)
 	}
-	proxy, err = p.proxy.Save(p.db, proxy)
+	err = p.proxy.BatchSave(p.db, proxies)
 	if err != nil {
 		resp.Code = constants.Status500
 		resp.Msg = err.Error()
@@ -37,7 +41,6 @@ func (p *ProxyServiceImpl) CreateProxy(request http.CreateProxyRequest) (resp ht
 	}
 	resp.Code = constants.Status200
 	resp.Msg = constants.MessageSuc
-	resp.Data.ProxyId = proxy.Id
 	return
 }
 func (p *ProxyServiceImpl) UpdateProxy(request http.UpdateProxyRequest) (resp http2.UpdateProxyResponse, err error) {
@@ -85,6 +88,7 @@ func (p *ProxyServiceImpl) ProxyList(request http.ProxyListRequest) (resp http2.
 			ProxyPort:   v.Port,
 			ProxySecret: v.Secret,
 			SetTime:     time.Now(),
+			ProxyId:     v.Id,
 		})
 	}
 	return

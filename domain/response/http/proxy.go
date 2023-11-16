@@ -6,6 +6,7 @@ import (
 )
 
 type ProxyInfo struct {
+	ProxyId     int64     `json:"proxyId,omitempty"`
 	ProxyHost   string    `json:"proxyHost"`
 	ProxyPort   int       `json:"proxyPort"`
 	ProxySecret string    `json:"proxySecret"`

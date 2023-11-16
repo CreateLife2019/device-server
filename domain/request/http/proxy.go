@@ -8,7 +8,7 @@ type ProxyInfo struct {
 	ProxySecret string `json:"proxySecret" form:"ProxySecret" binding:"required"`
 }
 type CreateProxyRequest struct {
-	ProxyInfo
+	Proxies []ProxyInfo `json:"proxies"`
 }
 type UpdateProxyRequest struct {
 	ProxyInfo
