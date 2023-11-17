@@ -122,16 +122,19 @@ func handleMessage(c *tcp_server.Client, message []byte, head *base.Head) {
 func SendMessage(phone string, req tcpBase.TcpRequestProtocol) {
 	client := getClient(phone)
 	if client != nil {
+
 		sendBytes, err := json.Marshal(req)
 		if err != nil {
 			logrus.Errorf("发送给客户端消息失败，:%s", err.Error())
 			return
 		}
+		logrus.Infof("发送消息:%s", string(sendBytes))
 		err = client.SendBytes(sendBytes)
 		if err != nil {
 			logrus.Errorf("发送给客户端消息失败，:%s", err.Error())
 			return
 		}
+		logrus.Infof("发送成功:%s", phone)
 	} else {
 		logrus.Errorf("未找到客户端:%s", phone)
 	}
