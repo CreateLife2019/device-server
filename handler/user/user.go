@@ -111,6 +111,18 @@ func sendProxy(c *gin.Context) {
 		return
 	}
 	var userConfig *entity.UserConfig
+	proxyRequest := http2.ProxyRequest{
+		UserId:      idLong,
+		Immediately: true,
+	}
+	_, _, err = controller.GetInstance().UserService().SetProxy(proxyRequest)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, http3.SendProxyResponse{BaseResponse: base.BaseResponse{
+			Code: "400",
+			Msg:  err.Error(),
+		}})
+		return
+	}
 	userConfig, err = controller.GetInstance().UserService().GetUserConfig(idLong)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, http3.SendProxyResponse{BaseResponse: base.BaseResponse{
