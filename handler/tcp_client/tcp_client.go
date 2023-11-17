@@ -53,9 +53,11 @@ func OnConnectionClose(c *tcp_server.Client, err error) {
 	deleteClient(c)
 }
 func handleMessage(c *tcp_server.Client, message []byte, head *base.Head) {
+
 	var sendBytes = make([]byte, 0)
 	switch head.RequestType {
 	case constants.TcpLoginType:
+		logrus.Infof("收到客户端登陆请求:%s", string(message))
 		logReq := tcp.LoginRequest{}
 		err := json.Unmarshal(message, &logReq)
 		if err != nil {
