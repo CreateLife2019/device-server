@@ -51,6 +51,8 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 			return
 		}
 		if len(userGroups) == 0 {
+			resp.Code = constants.Status200
+			resp.Msg = constants.MessageSuc
 			return
 		}
 		for _, v := range userGroups {
