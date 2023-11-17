@@ -11,8 +11,8 @@ type ProxyInfo struct {
 	ProxySecret string `json:"proxySecret"`
 }
 type ProxyRequest struct {
-	RequestType string `json:"requestType"`
-	ProxyInfo   []ProxyInfo
+	RequestType string      `json:"requestType"`
+	ProxyInfo   []ProxyInfo `json:"proxyInfo"`
 }
 
 func (p *ProxyRequest) HttpToTcp(request http.ProxyRequest) {
