@@ -54,3 +54,6 @@ type UserConfigInfoListResponse struct {
 type UpdateUserInfoResponse struct {
 	base.BaseResponse
 }
+type SetGroupResponse struct {
+	base.BaseResponse
+}

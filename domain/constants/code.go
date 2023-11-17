@@ -13,6 +13,7 @@ const (
 	MessageFailedServer                = "服务器错误"
 	MessageFailedConflictGroup         = "分组已存在不能新增或更新"
 	MessageFailedNotAllowedDeleteGroup = "分组下有用户不能删除"
+	MessageFailedGroupNotFound         = "未找到该分组"
 )
 
 const (

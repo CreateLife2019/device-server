@@ -18,6 +18,7 @@ func Register(e *gin.RouterGroup) {
 	e.PUT("/user/:userId", updateUserInfo)
 	e.GET("/user", userList)
 	e.POST("/user/config/proxy", setProxy)
+	e.POST("/user/set-group", setGroup)
 	e.POST("/user/config/send-proxy/:userId", sendProxy)
 	e.GET("/user/config", userConfigList)
 }
@@ -160,6 +161,23 @@ func updateUserInfo(c *gin.Context) {
 	} else {
 		var resp = http3.UpdateUserInfoResponse{}
 		resp, err = controller.GetInstance().UserService().UpdateUserInfo(updateReq)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, resp)
+		} else {
+			c.JSON(http.StatusOK, resp)
+		}
+	}
+}
+func setGroup(c *gin.Context) {
+	setGroupRequest := http2.SetGroupRequest{}
+	if err := c.ShouldBindJSON(&setGroupRequest); err != nil {
+		c.JSON(http.StatusBadRequest, http3.SetGroupResponse{BaseResponse: base.BaseResponse{
+			Code: "400",
+			Msg:  err.Error(),
+		}})
+	} else {
+		var resp = http3.SetGroupResponse{}
+		resp, err = controller.GetInstance().UserService().SetUserGroup(setGroupRequest)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, resp)
 		} else {

@@ -23,3 +23,8 @@ type ProxyRequest struct {
 	//Proxies     []ProxyInfo `json:"proxies"`
 	Immediately bool `json:"immediately"` //是否立即生效
 }
+
+type SetGroupRequest struct {
+	UserId  int64 `json:"userId,string"`
+	GroupId int64 `json:"groupId,string"`
+}

@@ -19,4 +19,5 @@ type UserIer interface {
 	UpdateUserConfig(tx *gorm.DB, in *entity.UserConfig, scopes ...func(db *gorm.DB) *gorm.DB) (err error)
 	OfflineUsers(db *gorm.DB, userIds []int64) error
 	SearchUserGroup(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (users []*entity.UserGroup, err error)
+	UpdateUserGroup(tx *gorm.DB, in *entity.UserGroup, scopes ...func(db *gorm.DB) *gorm.DB) (err error)
 }

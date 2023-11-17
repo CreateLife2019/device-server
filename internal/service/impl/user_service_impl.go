@@ -29,7 +29,7 @@ type UserServiceImpl struct {
 
 func NewUserService(db *gorm.DB) *UserServiceImpl {
 
-	s := &UserServiceImpl{db: db, user: &impl.UserIerImpl{}, proxy: &impl.ProxyImpl{}}
+	s := &UserServiceImpl{db: db, user: &impl.UserIerImpl{}, proxy: &impl.ProxyImpl{}, group: &impl.GroupImpl{}}
 	s.checkHeartbeat()
 	return s
 }
@@ -292,6 +292,28 @@ func (u *UserServiceImpl) GetUserConfig(userId int64) (user *entity.UserConfig, 
 }
 func (u *UserServiceImpl) UpdateUserInfo(request http.UpdateUserInfoRequest) (resp http2.UpdateUserInfoResponse, err error) {
 	err = u.user.Update(u.db, &entity.User{Remark: request.Remark}, filter.WithId(request.UserId))
+	if err != nil {
+		resp.Code = constants.Status500
+		resp.Msg = err.Error()
+		return
+	}
+	resp.Code = constants.Status200
+	resp.Msg = constants.MessageSuc
+	return
+}
+
+func (u *UserServiceImpl) SetUserGroup(request http.SetGroupRequest) (resp http2.SetGroupResponse, err error) {
+	// 一个用户只能一个分组
+	_, err = u.group.Get(u.db, filter.WithId(request.GroupId))
+	if err != nil {
+		resp.Code = constants.Status500
+		resp.Msg = constants.MessageFailedGroupNotFound
+		return
+	}
+	err = u.user.UpdateUserGroup(u.db, &entity.UserGroup{
+		UserId:  request.UserId,
+		GroupId: request.GroupId,
+	}, filter.WithUserId(request.UserId))
 	if err != nil {
 		resp.Code = constants.Status500
 		resp.Msg = err.Error()

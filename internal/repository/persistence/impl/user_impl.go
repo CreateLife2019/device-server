@@ -99,3 +99,9 @@ func (u *UserIerImpl) SearchUserGroup(db *gorm.DB, page *entity.Page, scopes ...
 	err = db.Order("f_created_at desc").Find(&users).Error
 	return
 }
+func (u *UserIerImpl) UpdateUserGroup(db *gorm.DB, in *entity.UserGroup, scopes ...func(db *gorm.DB) *gorm.DB) (err error) {
+	return db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "f_user_id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"f_group_id"}),
+	}).Create(in).Error
+}
