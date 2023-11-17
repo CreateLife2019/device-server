@@ -113,7 +113,9 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 		}
 		if find, ok := userGroupMap[v.Id]; ok {
 			item.GroupId = find.GroupId
-			item.GroupName = groupMap[find.GroupId].Name
+			if findGroup, ok2 := groupMap[find.GroupId]; ok2 {
+				item.GroupName = findGroup.Name
+			}
 		}
 		resp.Data.Users = append(resp.Data.Users, item)
 
