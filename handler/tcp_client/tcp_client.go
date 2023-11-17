@@ -62,6 +62,10 @@ func handleMessage(c *tcp_server.Client, message []byte, head *base.Head) {
 			logrus.Errorf("收到客户端消息，解析失败:%s", err.Error())
 			return
 		}
+		if logReq.Phone == "" {
+			logrus.Infof("手机号空：%+v", logReq)
+			return
+		}
 		resp, err := controller.GetInstance().UserService().Login(logReq)
 		if err != nil {
 			sendBytes = resp.BuildFailed("500")
