@@ -110,6 +110,8 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 			item.Online = find.Online
 			if strings.ToLower(find.ProxyType) != "none" {
 				item.Agent = 1
+			} else {
+				item.Agent = 2
 			}
 			item.DeviceName = find.AppVersion
 			item.ProxyIp = find.ProxyIp
