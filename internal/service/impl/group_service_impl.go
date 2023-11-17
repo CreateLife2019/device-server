@@ -76,6 +76,8 @@ func (p *GroupServiceImpl) GroupList(request http.GroupListRequest) (resp http2.
 		Page:     request.Page,
 		PageSize: request.PageSize,
 	}
+	resp.Data.Page = page.Page
+	resp.Data.PageSize = page.PageSize
 	resp.Data.Groups = make([]http2.GroupInfo, 0)
 	groups, err = p.group.SearchGroup(p.db, page, filter.WithLickName(request.Name))
 	if err != nil {
@@ -88,7 +90,6 @@ func (p *GroupServiceImpl) GroupList(request http.GroupListRequest) (resp http2.
 	resp.Data.Total = page.Total
 	resp.Data.Page = page.Page
 	resp.Data.PageSize = page.PageSize
-
 	for _, v := range groups {
 		resp.Data.Groups = append(resp.Data.Groups, http2.GroupInfo{
 			GroupId: v.Id,

@@ -70,6 +70,8 @@ func (p *ProxyServiceImpl) ProxyList(request http.ProxyListRequest) (resp http2.
 		Page:     request.Page,
 		PageSize: request.PageSize,
 	}
+	resp.Data.Page = page.Page
+	resp.Data.PageSize = page.PageSize
 	proxies, err = p.proxy.SearchProxy(p.db, page)
 	if err != nil {
 		resp.Code = constants.Status500

@@ -110,6 +110,8 @@ func (a *AccountServiceImpl) AccountList(request http.AccountListRequest) (resp 
 		Page:     request.Page,
 		PageSize: request.PageSize,
 	}
+	resp.Data.Page = page.Page
+	resp.Data.PageSize = page.PageSize
 	accounts, err = a.account.SearchAccount(a.db, page)
 	if err != nil {
 		return

@@ -40,6 +40,8 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 		Page:     request.Page,
 		PageSize: request.PageSize,
 	}
+	resp.Data.Page = page.Page
+	resp.Data.PageSize = page.PageSize
 	userIds := make([]int64, 0)
 	if request.UserId != 0 {
 		userIds = append(userIds, request.UserId)
@@ -64,8 +66,7 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 		return
 	}
 	resp.Data.Total = page.Total
-	resp.Data.Page = page.Page
-	resp.Data.PageSize = page.PageSize
+
 	userIds = make([]int64, 0)
 	for _, v := range users {
 		userIds = append(userIds, v.Id)
