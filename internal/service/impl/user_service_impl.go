@@ -147,6 +147,7 @@ func (u *UserServiceImpl) Login(request tcpRequest.LoginRequest) (resp tcp.TcpRe
 		HeartbeatTime: loginTime,
 		AppVersion:    request.AppVersion,
 		ProxyType:     request.ProxyType,
+		ProxyIp:       request.ProxyHost,
 	}
 
 	err = u.db.Transaction(func(tx *gorm.DB) error {
