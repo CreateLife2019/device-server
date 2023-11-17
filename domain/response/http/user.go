@@ -17,6 +17,7 @@ type UserInfo struct {
 	Agent      int    `json:"agent"`
 	GroupId    int64  `json:"groupId"`
 	GroupName  string `json:"groupName"`
+	ProxyIp    string `json:"proxyIp"`
 }
 
 type UserListData struct {

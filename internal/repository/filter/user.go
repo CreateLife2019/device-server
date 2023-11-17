@@ -44,7 +44,10 @@ func WithInId(ids []int64) func(db *gorm.DB) *gorm.DB {
 }
 func WithInUserId(userId []int64) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		db = db.Where("f_user_id in ?  ", userId)
+		if len(userId) != 0 {
+			db = db.Where("f_user_id in ?  ", userId)
+		}
+
 		return db
 	}
 }

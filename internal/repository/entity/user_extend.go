@@ -11,6 +11,7 @@ type UserExtend struct {
 	AppVersion    string    `json:"appVersion" gorm:"column:f_app_version"`
 	ProxyType     string    `json:"proxyType" gorm:"column:f_proxy_type"`
 	HeartbeatTime time.Time `json:"heartbeatTime" gorm:"column:f_heartbeat_time"`
+	ProxyIp       string    `json:"proxyIp" gorm:"column:f_proxy_ip;NOT NULL;default:''"`
 }
 
 func (a *UserExtend) TableName() string {

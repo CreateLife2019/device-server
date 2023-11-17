@@ -14,7 +14,6 @@ import (
 	"github.com/device-server/internal/repository/persistence/impl"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"math/rand"
 	"strings"
 	"time"
 )
@@ -113,6 +112,7 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 				item.Agent = 1
 			}
 			item.DeviceName = find.AppVersion
+			item.ProxyIp = find.ProxyIp
 		}
 		if find, ok := userGroupMap[v.Id]; ok {
 			item.GroupId = find.GroupId
@@ -206,7 +206,7 @@ func (u *UserServiceImpl) Offline(request tcpRequest.OfflineRequest) (resp tcp.T
 func (u *UserServiceImpl) Get(userId int64) (user *entity.User, err error) {
 	return u.user.Get(u.db, filter.WithId(userId))
 }
-func (u *UserServiceImpl) SetProxy(request http.ProxyRequest) (selectProxy *entity.Proxy, resp http2.SetProxyResponse, err error) {
+func (u *UserServiceImpl) SetProxy(request http.ProxyRequest) (selectProxy []*entity.Proxy, resp http2.SetProxyResponse, err error) {
 	resp = http2.SetProxyResponse{BaseResponse: base.BaseResponse{Code: constants.Status200, Msg: constants.MessageSuc}}
 	_, err = u.user.Get(u.db, filter.WithId(request.UserId))
 	if err != nil {
@@ -226,14 +226,13 @@ func (u *UserServiceImpl) SetProxy(request http.ProxyRequest) (selectProxy *enti
 		resp.Msg = constants.MessageFailedNoProxy
 		return
 	}
-	num := 0
-	if len(proxies) != 1 {
-		num = rand.Intn(len(proxies) - 1)
-	}
-	selectProxy = proxies[num]
+
+	selectProxy = proxies
 	userConfig := &entity.UserConfig{}
-	selectProxy.Time = time.Now()
-	userConfig.Proxies = append(userConfig.Proxies, *selectProxy)
+	for _, v := range proxies {
+		v.Time = time.Now()
+		userConfig.Proxies = append(userConfig.Proxies, *v)
+	}
 	userConfig.UserId = request.UserId
 	_, err = u.user.GetOrCreateUserConfig(u.db, userConfig, filter.WithUserId(request.UserId))
 	if err != nil {

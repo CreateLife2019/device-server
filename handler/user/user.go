@@ -10,6 +10,7 @@ import (
 	"github.com/device-server/handler/tcp_client"
 	"github.com/device-server/internal/repository/entity"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
@@ -54,7 +55,7 @@ func setProxy(c *gin.Context) {
 		}})
 	} else {
 		var resp http3.SetProxyResponse
-		var selectProxy *entity.Proxy
+		var selectProxy []*entity.Proxy
 		selectProxy, resp, err = controller.GetInstance().UserService().SetProxy(proxyRequest)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, http3.SetProxyResponse{BaseResponse: base.BaseResponse{
@@ -75,11 +76,14 @@ func setProxy(c *gin.Context) {
 				proxyReq := tcp.ProxyRequest{
 					RequestType: constants.TcpSetProxy,
 				}
-				proxyReq.ProxyInfo = append(proxyReq.ProxyInfo, tcp.ProxyInfo{
-					ProxyHost:   selectProxy.Host,
-					ProxyPort:   selectProxy.Port,
-					ProxySecret: selectProxy.Secret,
-				})
+				for _, v := range selectProxy {
+					proxyReq.ProxyInfo = append(proxyReq.ProxyInfo, tcp.ProxyInfo{
+						ProxyHost:   v.Host,
+						ProxyPort:   v.Port,
+						ProxySecret: v.Secret,
+					})
+				}
+				logrus.Infof("下发代理信息:%+v", proxyReq)
 				tcp_client.SendMessage(user.Phone, &proxyReq)
 			}
 
