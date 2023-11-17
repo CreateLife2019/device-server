@@ -15,6 +15,7 @@ import (
 )
 
 func Register(e *gin.RouterGroup) {
+	e.PUT("/user/:userId", updateUserInfo)
 	e.GET("/user", userList)
 	e.POST("/user/config/proxy", setProxy)
 	e.POST("/user/config/send-proxy/:userId", sendProxy)
@@ -135,6 +136,32 @@ func userConfigList(c *gin.Context) {
 				Code: "400",
 				Msg:  err.Error(),
 			}})
+		} else {
+			c.JSON(http.StatusOK, resp)
+		}
+	}
+}
+func updateUserInfo(c *gin.Context) {
+	id := c.Param("userId")
+	idLong, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, http3.UpdateUserInfoResponse{BaseResponse: base.BaseResponse{
+			Code: "400",
+			Msg:  err.Error(),
+		}})
+		return
+	}
+	updateReq := http2.UpdateUserInfoRequest{UserId: idLong}
+	if err := c.ShouldBindJSON(&updateReq); err != nil {
+		c.JSON(http.StatusBadRequest, http3.UpdateUserInfoResponse{BaseResponse: base.BaseResponse{
+			Code: "400",
+			Msg:  err.Error(),
+		}})
+	} else {
+		var resp = http3.UpdateUserInfoResponse{}
+		resp, err = controller.GetInstance().UserService().UpdateUserInfo(updateReq)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, resp)
 		} else {
 			c.JSON(http.StatusOK, resp)
 		}

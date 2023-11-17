@@ -23,6 +23,7 @@ type UserServiceImpl struct {
 	db       *gorm.DB
 	user     persistence.UserIer
 	proxy    persistence.ProxyIer
+	group    persistence.GroupIer
 	stopChan chan struct{}
 }
 
@@ -33,30 +34,65 @@ func NewUserService(db *gorm.DB) *UserServiceImpl {
 	return s
 }
 func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserListResponse, err error) {
+	resp.Data.Users = make([]http2.UserInfo, 0)
 	users := make([]*entity.User, 0)
 	page := &entity.Page{
 		Page:     request.Page,
 		PageSize: request.PageSize,
 	}
-	users, err = u.user.SearchUser(u.db, page, filter.WithId(request.UserId))
+	userIds := make([]int64, 0)
+	if request.UserId != 0 {
+		userIds = append(userIds, request.UserId)
+	}
+	if request.GroupId != 0 {
+		var userGroups []*entity.UserGroup
+		userGroups, err = u.user.SearchUserGroup(u.db, page, filter.WithGroupId([]int64{request.GroupId}))
+		if err != nil {
+			return
+		}
+		if len(userGroups) == 0 {
+			return
+		}
+		for _, v := range userGroups {
+			userIds = append(userIds, v.UserId)
+		}
+	}
+	users, err = u.user.SearchUser(u.db, page, filter.WithInId(userIds))
 	if err != nil {
 		return
 	}
 	resp.Data.Total = page.Total
 	resp.Data.Page = page.Page
 	resp.Data.PageSize = page.PageSize
-	resp.Data.Users = make([]http2.UserInfo, 0)
-	userIds := make([]int64, 0)
+	userIds = make([]int64, 0)
 	for _, v := range users {
 		userIds = append(userIds, v.Id)
 	}
-	userExtens, err := u.user.SearchUserExtend(u.db, nil, filter.WithInUserId(userIds))
+	userExtends, err := u.user.SearchUserExtend(u.db, nil, filter.WithInUserId(userIds))
 	if err != nil {
 		return
 	}
 	userExtendMap := map[int64]*entity.UserExtend{}
-	for _, v := range userExtens {
+	for _, v := range userExtends {
 		userExtendMap[v.UserId] = v
+	}
+	userGroups, err := u.user.SearchUserGroup(u.db, nil, filter.WithInUserId(userIds))
+	if err != nil {
+		return
+	}
+	userGroupMap := map[int64]*entity.UserGroup{}
+	groupIds := make([]int64, 0)
+	for _, v := range userGroups {
+		userGroupMap[v.UserId] = v
+		groupIds = append(groupIds, v.GroupId)
+	}
+	groups, err := u.group.SearchGroup(u.db, nil, filter.WithInId(groupIds))
+	if err != nil {
+		return
+	}
+	groupMap := map[int64]*entity.Group{}
+	for _, v := range groups {
+		groupMap[v.Id] = v
 	}
 	for _, v := range users {
 		item := http2.UserInfo{
@@ -74,6 +110,10 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 				item.Agent = 1
 			}
 			item.DeviceName = find.AppVersion
+		}
+		if find, ok := userGroupMap[v.Id]; ok {
+			item.GroupId = find.GroupId
+			item.GroupName = groupMap[find.GroupId].Name
 		}
 		resp.Data.Users = append(resp.Data.Users, item)
 
@@ -249,6 +289,17 @@ func (u *UserServiceImpl) ListUserConfig(request http.UserConfigListRequest) (re
 }
 func (u *UserServiceImpl) GetUserConfig(userId int64) (user *entity.UserConfig, err error) {
 	return u.user.GetUserConfig(u.db, filter.WithUserId(userId))
+}
+func (u *UserServiceImpl) UpdateUserInfo(request http.UpdateUserInfoRequest) (resp http2.UpdateUserInfoResponse, err error) {
+	err = u.user.Update(u.db, &entity.User{Remark: request.Remark}, filter.WithId(request.UserId))
+	if err != nil {
+		resp.Code = constants.Status500
+		resp.Msg = err.Error()
+		return
+	}
+	resp.Code = constants.Status200
+	resp.Msg = constants.MessageSuc
+	return
 }
 func (u *UserServiceImpl) checkHeartbeat() {
 	go func() {

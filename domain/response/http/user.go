@@ -15,6 +15,8 @@ type UserInfo struct {
 	Ip         string `json:"ip"`
 	Online     int    `json:"online"`
 	Agent      int    `json:"agent"`
+	GroupId    int64  `json:"groupId"`
+	GroupName  string `json:"groupName"`
 }
 
 type UserListData struct {
@@ -48,4 +50,7 @@ type UserConfigInfoListData struct {
 type UserConfigInfoListResponse struct {
 	base.BaseResponse
 	Data UserConfigInfoListData `json:"data"`
+}
+type UpdateUserInfoResponse struct {
+	base.BaseResponse
 }

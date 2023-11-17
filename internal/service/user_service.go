@@ -17,4 +17,5 @@ type UserService interface {
 	Get(userId int64) (user *entity.User, err error)
 	ListUserConfig(request http.UserConfigListRequest) (resp http2.UserConfigInfoListResponse, err error)
 	GetUserConfig(userId int64) (user *entity.UserConfig, err error)
+	UpdateUserInfo(request http.UpdateUserInfoRequest) (resp http2.UpdateUserInfoResponse, err error)
 }

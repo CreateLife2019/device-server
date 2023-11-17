@@ -45,3 +45,29 @@ func WithInUserId(userId []int64) func(db *gorm.DB) *gorm.DB {
 		return db
 	}
 }
+func WithGroupId(ids []int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		db = db.Where("f_group_id in ?  ", ids)
+		return db
+	}
+}
+func WithLickName(name string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if name != "" {
+			condition := "%" + name + "%"
+			db = db.Where("f_name like ?  ", condition)
+		}
+
+		return db
+	}
+}
+func WithName(name string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if name != "" {
+
+			db = db.Where("f_name = ?  ", name)
+		}
+
+		return db
+	}
+}

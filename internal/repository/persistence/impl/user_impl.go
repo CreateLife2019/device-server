@@ -89,3 +89,13 @@ func (u *UserIerImpl) SearchUserConfig(db *gorm.DB, page *entity.Page, scopes ..
 func (u *UserIerImpl) OfflineUsers(db *gorm.DB, userIds []int64) error {
 	return db.Model(&entity.UserExtend{}).Where("f_id in ?", userIds).Update("f_online", 2).Error
 }
+
+func (u *UserIerImpl) SearchUserGroup(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (users []*entity.UserGroup, err error) {
+	db = db.Model(&entity.UserGroup{}).Scopes(scopes...)
+	if page != nil {
+		db.Count(&page.Total)
+		db = db.Scopes(filter.Page(page))
+	}
+	err = db.Order("f_created_at desc").Find(&users).Error
+	return
+}
