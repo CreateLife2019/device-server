@@ -25,7 +25,7 @@ func getClient(phone string) *tcp_server.Client {
 	defer lock.Unlock()
 	return clientMap[phone]
 }
-func deleteClient(c *tcp_server.Client) {
+func deleteClient(c *tcp_server.Client) string {
 	lock.Lock()
 	defer lock.Unlock()
 	phone := ""
@@ -38,6 +38,7 @@ func deleteClient(c *tcp_server.Client) {
 	if phone != "" {
 		delete(clientMap, phone)
 	}
+	return phone
 }
 
 func Onmessage(c *tcp_server.Client, message []byte) {
@@ -50,7 +51,13 @@ func Onmessage(c *tcp_server.Client, message []byte) {
 	}
 }
 func OnConnectionClose(c *tcp_server.Client, err error) {
-	deleteClient(c)
+	phone := deleteClient(c)
+	if phone != "" {
+		logrus.Infof("连接关闭，用户下线：%s", phone)
+		_, err = controller.GetInstance().UserService().Offline(tcp.OfflineRequest{
+			Phone: phone,
+		})
+	}
 }
 func handleMessage(c *tcp_server.Client, message []byte, head *base.Head) {
 
