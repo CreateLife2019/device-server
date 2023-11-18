@@ -166,6 +166,17 @@ func (u *UserServiceImpl) Login(request tcpRequest.LoginRequest) (resp tcp.TcpRe
 		if err != nil {
 			return err
 		}
+		var userGroups []*entity.UserGroup
+		userGroups, err = u.user.SearchUserGroup(u.db, nil, filter.WithUserId(user.Id))
+		if err != nil {
+			return err
+		}
+		if len(userGroups) == 0 {
+			err = u.user.UpdateUserGroup(u.db, &entity.UserGroup{
+				UserId:  user.Id,
+				GroupId: global.Cfg.ServerCfg.SystemGroupId,
+			}, filter.WithUserId(user.Id))
+		}
 		tcpResp.UserId = userExtend.UserId
 		return err
 	})

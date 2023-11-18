@@ -19,6 +19,7 @@
     "tcpPort": 7090,
     "heartbeatTime": 120000000000,
     "algorithm":"",
-    "key":"V2HTkjYP44G4kyET"
+    "key":"V2HTkjYP44G4kyET",
+    "systemGroupId": 1
   }
 }

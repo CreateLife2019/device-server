@@ -113,6 +113,18 @@ func (p *GroupServiceImpl) DeleteGroup(groupId int64) (resp http2.DeleteGroupRes
 		resp.Msg = constants.MessageFailedNotFound
 		return
 	}
+
+	group, err = p.group.Get(p.db, filter.WithId(groupId))
+	if err != nil {
+		resp.Code = constants.Status500
+		resp.Msg = constants.MessageFailedNotFound
+		return
+	}
+	if group.System == 1 {
+		resp.Code = constants.Status500
+		resp.Msg = constants.MessageFailedForbiddenDeleteGroup
+		return
+	}
 	err = p.group.Delete(p.db, group)
 	if err != nil {
 		resp.Code = constants.Status500
