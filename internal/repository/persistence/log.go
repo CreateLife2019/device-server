@@ -7,4 +7,5 @@ import (
 
 type LogIer interface {
 	Save(db *gorm.DB, in *entity.LoginLog) (account *entity.LoginLog, err error)
+	SearchLog(db *gorm.DB, page *entity.Page, scopes ...func(*gorm.DB) *gorm.DB) (logs []*entity.LoginLog, err error)
 }

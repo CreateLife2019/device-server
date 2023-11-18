@@ -77,3 +77,13 @@ func WithName(name string) func(db *gorm.DB) *gorm.DB {
 		return db
 	}
 }
+func WithLickAccount(name string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if name != "" {
+			condition := "%" + name + "%"
+			db = db.Where("f_account like ?  ", condition)
+		}
+
+		return db
+	}
+}

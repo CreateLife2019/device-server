@@ -16,10 +16,11 @@ import (
 type AccountServiceImpl struct {
 	db      *gorm.DB
 	account persistence.AccountIer
+	log     persistence.LogIer
 }
 
 func NewAccountService(db *gorm.DB) *AccountServiceImpl {
-	return &AccountServiceImpl{db: db, account: &impl.AccountImpl{}}
+	return &AccountServiceImpl{db: db, account: &impl.AccountImpl{}, log: &impl.LogImpl{}}
 }
 func (a *AccountServiceImpl) Login(request http.LoginRequest) (resp http2.LoginResponse, err error) {
 	var account *entity.Account
@@ -39,6 +40,16 @@ func (a *AccountServiceImpl) Login(request http.LoginRequest) (resp http2.LoginR
 	resp.Code = "200"
 	resp.Msg = constants.MessageSuc
 	resp.Data.AccountId = account.Id
+	_, err = a.log.Save(a.db, &entity.LoginLog{
+		AccountId: account.Id,
+		Account:   account.UserName,
+		Ip:        request.ClientIp,
+	})
+	if err != nil {
+		resp.Code = "400"
+		resp.Msg = err.Error()
+		return
+	}
 	return
 }
 func (a *AccountServiceImpl) CreateAccount(request http.CreateAccountRequest) (resp http2.CreateAccountResponse, err error) {
@@ -153,4 +164,31 @@ func (a *AccountServiceImpl) CheckUser(userName, password string) bool {
 		return false
 	}
 	return true
+}
+func (a *AccountServiceImpl) SearchLoginLog(request http.LoginLogRequest) (resp http2.LoginLogResponse, err error) {
+	logs := make([]*entity.LoginLog, 0)
+	page := &entity.Page{
+		Page:     request.Page,
+		PageSize: request.PageSize,
+	}
+	resp.Data.Page = page.Page
+	resp.Data.PageSize = page.PageSize
+	logs, err = a.log.SearchLog(a.db, page, filter.WithLickAccount(request.Account))
+	if err != nil {
+		return
+	}
+	resp.Code = "200"
+	resp.Msg = constants.MessageSuc
+	resp.Data.Total = page.Total
+	resp.Data.Page = page.Page
+	resp.Data.PageSize = page.PageSize
+	resp.Data.LoginLogs = make([]http2.LoginLogInfo, 0)
+	for _, v := range logs {
+		resp.Data.LoginLogs = append(resp.Data.LoginLogs, http2.LoginLogInfo{
+			Ip:        v.Ip,
+			LoginTime: *v.CreatedAt,
+			Account:   v.Account,
+		})
+	}
+	return
 }

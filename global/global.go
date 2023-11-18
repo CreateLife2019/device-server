@@ -79,5 +79,5 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	Db.AutoMigrate(&entity.Account{}, &entity.User{}, &entity.VerifyCode{}, &entity.UserExtend{}, &entity.UserConfig{}, &entity.Proxy{}, &entity.UserGroup{}, &entity.Group{})
+	Db.AutoMigrate(&entity.Account{}, &entity.User{}, &entity.VerifyCode{}, &entity.UserExtend{}, &entity.Proxy{}, &entity.UserGroup{}, &entity.Group{}, &entity.LoginLog{})
 }

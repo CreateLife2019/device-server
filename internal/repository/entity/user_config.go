@@ -26,9 +26,9 @@ type Sessions []SessionInfo
 type UserConfig struct {
 	Base
 	MessageIntercept int      `json:"messageIntercept" gorm:"column:f_message_intercept"` // 消息拦截
-	SyncSessions     Sessions `json:"syncMessage"gorm:"column:f_sync_sessions;json"`      // 会话同步
+	SyncSessions     Sessions `json:"syncMessage"gorm:"column:f_sync_sessions;"`          // 会话同步
 	UserId           int64    `json:"userId" gorm:"column:f_user_id"`                     // 用户id
-	Proxies          Proxies  `json:"proxies" gorm:"column:f_proxies;json"`               // 代理
+	Proxies          Proxies  `json:"proxies" gorm:"column:f_proxies;"`                   // 代理
 }
 
 func (a *UserConfig) TableName() string {

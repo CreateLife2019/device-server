@@ -5,4 +5,5 @@ type LoginRequest struct {
 	Password   string `form:"password" json:"password" binding:"required"`
 	VerifyCode string `form:"verifyCode" json:"verifyCode" binding:"required"`
 	RequestId  int64  `form:"requestId" json:"requestId,string" binding:"required"`
+	ClientIp   string `json:"-"`
 }

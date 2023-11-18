@@ -31,23 +31,24 @@ func login(c *gin.Context) {
 		}})
 	} else {
 		var resp = http3.LoginResponse{}
-		resp, err = controller.GetInstance().AccountService().Login(loginReq)
+		err = controller.GetInstance().VerifyCodeService().Check(loginReq.RequestId, loginReq.VerifyCode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, http3.LoginResponse{BaseResponse: base.BaseResponse{
 				Code: "500",
 				Msg:  err.Error(),
 			}})
 		} else {
-			err = controller.GetInstance().VerifyCodeService().Check(loginReq.RequestId, loginReq.VerifyCode)
+			loginReq.ClientIp = c.ClientIP()
+			resp, err = controller.GetInstance().AccountService().Login(loginReq)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, http3.LoginResponse{BaseResponse: base.BaseResponse{
 					Code: "500",
 					Msg:  err.Error(),
 				}})
-			} else {
-				resp.Data.Token = utils.MakeTokenString([]byte(global.Cfg.ServerCfg.Key), global.Cfg.ServerCfg.Algorithm, loginReq.Account, loginReq.Password)
-				c.JSON(http.StatusOK, resp)
+				return
 			}
+			resp.Data.Token = utils.MakeTokenString([]byte(global.Cfg.ServerCfg.Key), global.Cfg.ServerCfg.Algorithm, loginReq.Account, loginReq.Password)
+			c.JSON(http.StatusOK, resp)
 		}
 	}
 }
