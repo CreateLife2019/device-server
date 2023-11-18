@@ -1,8 +1,9 @@
 package constants
 
 const (
-	TcpLoginType = "LoginInfo"
-	TcpHeartbeat = "Heartbeat"
-	TcpOffline   = "Offline"
-	TcpSetProxy  = "SetProxy"
+	TcpLoginType      = "LoginInfo"
+	TcpHeartbeat      = "Heartbeat"
+	TcpOffline        = "Offline"
+	TcpSetProxy       = "SetProxy"
+	TcpSetCancelProxy = "CancelProxy"
 )

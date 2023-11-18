@@ -19,8 +19,10 @@ func Register(e *gin.RouterGroup) {
 	e.PUT("/user/:userId", updateUserInfo)
 	e.GET("/user", userList)
 	e.POST("/user/config/proxy", setProxy)
+	e.POST("/user/config/intercept", setIntercept)
 	e.POST("/user/set-group", setGroup)
 	e.POST("/user/config/send-proxy/:userId", sendProxy)
+	e.POST("/user/config/cancel-proxy/:userId", cancelProxy)
 	e.GET("/user/config", userConfigList)
 }
 
@@ -200,4 +202,37 @@ func setGroup(c *gin.Context) {
 			c.JSON(http.StatusOK, resp)
 		}
 	}
+}
+func setIntercept(c *gin.Context) {
+
+}
+
+func cancelProxy(c *gin.Context) {
+	id := c.Param("userId")
+	idLong, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, http3.UpdateUserInfoResponse{BaseResponse: base.BaseResponse{
+			Code: "400",
+			Msg:  err.Error(),
+		}})
+		return
+	}
+	var user *entity.User
+	user, err = controller.GetInstance().UserService().Get(idLong)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, http3.SendProxyResponse{BaseResponse: base.BaseResponse{
+			Code: "400",
+			Msg:  err.Error(),
+		}})
+		return
+	}
+	proxyReq := tcp.CancelProxyRequest{
+		Phone:       user.Phone,
+		RequestType: constants.TcpSetCancelProxy,
+	}
+	tcp_client.SendMessage(user.Phone, &proxyReq)
+	c.JSON(http.StatusOK, http3.SendProxyResponse{BaseResponse: base.BaseResponse{
+		Code: constants.Status200,
+		Msg:  constants.MessageSuc,
+	}})
 }

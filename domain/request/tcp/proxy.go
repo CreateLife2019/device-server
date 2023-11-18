@@ -28,3 +28,12 @@ func (p *ProxyRequest) HttpToTcp(request http.ProxyRequest) {
 func (p *ProxyRequest) ProtocolType() string {
 	return constants.TcpSetProxy
 }
+
+type CancelProxyRequest struct {
+	Phone       string `json:"phone"`
+	RequestType string `json:"requestType"`
+}
+
+func (p *CancelProxyRequest) ProtocolType() string {
+	return constants.TcpSetCancelProxy
+}

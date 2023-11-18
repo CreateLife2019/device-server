@@ -28,3 +28,12 @@ type SetGroupRequest struct {
 	UserId  int64 `json:"userId,string"`
 	GroupId int64 `json:"groupId,string"`
 }
+type InterceptInfo struct {
+	UserId  []int64 `json:"userId,omitempty"`
+	GroupId []int64 `json:"groupId,omitempty"`
+}
+type MessageInterceptRequest struct {
+	UserId  int64         `json:"userId" binding:"required"`
+	Send    InterceptInfo `json:"send,omitempty"`
+	Receive InterceptInfo `json:"receive,omitempty"`
+}
