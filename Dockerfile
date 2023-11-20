@@ -1,23 +1,19 @@
 # syntax=docker/dockerfile:1
-
-FROM --platform=$TARGETPLATFORM golang:alpine AS builder
-
+ARG  TARGETPLATFORM=linux/amd64 
+FROM --platform=${TARGETPLATFORM} golang:alpine AS builder
+USER root
 WORKDIR /app
 COPY go.mod ./
 COPY go.sum ./
 
 COPY . ./
-COPY *.json ./
-COPY *.html ./
-RUN export GOPROXY=https://goproxy.cn
+RUN export GOPROXY=https://goproxy.io,direct
 RUN go mod tidy
 RUN go build -o /device-server
 
 FROM alpine AS runner
 WORKDIR /app
 COPY --from=builder . ./
-COPY --from=builder *.json ./
-COPY --from=builder *.html ./
 
 EXPOSE 8090
 
