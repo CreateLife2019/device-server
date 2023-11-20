@@ -18,6 +18,7 @@ import (
 func Register(e *gin.RouterGroup) {
 	e.PUT("/user/:userId", updateUserInfo)
 	e.GET("/user", userList)
+	e.GET("/user-extend", userExtend)
 	e.POST("/user/config/proxy", setProxy)
 	e.POST("/user/config/intercept", setIntercept)
 	e.POST("/user/set-group", setGroup)
@@ -47,7 +48,27 @@ func userList(c *gin.Context) {
 		}
 	}
 }
+func userExtend(c *gin.Context) {
+	userListReq := http2.UserListRequest{}
+	if err := c.ShouldBindQuery(&userListReq); err != nil {
+		c.JSON(http.StatusBadRequest, http3.UserExtendListResponse{BaseResponse: base.BaseResponse{
+			Code: "400",
+			Msg:  err.Error(),
+		}})
 
+	} else {
+		var resp http3.UserExtendListResponse
+		resp, err = controller.GetInstance().UserService().ListUserExtend(userListReq)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, http3.UserExtendListResponse{BaseResponse: base.BaseResponse{
+				Code: constants.Status500,
+				Msg:  err.Error(),
+			}})
+		} else {
+			c.JSON(http.StatusOK, resp)
+		}
+	}
+}
 func setProxy(c *gin.Context) {
 	proxyRequest := http2.ProxyRequest{}
 	if err := c.ShouldBindJSON(&proxyRequest); err != nil {

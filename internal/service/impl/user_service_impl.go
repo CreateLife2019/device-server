@@ -47,7 +47,7 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 	}
 	if request.GroupId != 0 {
 		var userGroups []*entity.UserGroup
-		userGroups, err = u.user.SearchUserGroup(u.db, page, filter.WithGroupId([]int64{request.GroupId}))
+		userGroups, err = u.user.SearchUserGroup(u.db, nil, filter.WithGroupId([]int64{request.GroupId}))
 		if err != nil {
 			return
 		}
@@ -97,37 +97,42 @@ func (u *UserServiceImpl) List(request http.UserListRequest) (resp http2.UserLis
 		groupMap[v.Id] = v
 	}
 	for _, v := range users {
-		item := http2.UserInfo{
-			Name:     v.Name,
-			Phone:    v.Phone,
-			NickName: v.NickName,
-			Avatar:   v.Avatar,
-			Remark:   v.Remark,
-			Id:       v.Id,
-		}
-		if find, ok := userExtendMap[v.Id]; ok {
-			item.Ip = find.ClientIp
-			item.Online = find.Online
-			if strings.ToLower(find.ProxyType) != "none" {
-				item.Agent = 1
-			} else {
-				item.Agent = 2
-			}
-			item.DeviceName = find.AppVersion
-			item.ProxyIp = find.ProxyIp
-		}
-		if find, ok := userGroupMap[v.Id]; ok {
-			item.GroupId = find.GroupId
-			if findGroup, ok2 := groupMap[find.GroupId]; ok2 {
-				item.GroupName = findGroup.Name
-			}
-		}
-		resp.Data.Users = append(resp.Data.Users, item)
+
+		resp.Data.Users = append(resp.Data.Users, u.buildUserInfo(v, userExtendMap, userGroupMap, groupMap))
 
 	}
 	resp.Code = constants.Status200
 	resp.Msg = constants.MessageSuc
 	return
+}
+
+func (u *UserServiceImpl) buildUserInfo(v *entity.User, userExtendMap map[int64]*entity.UserExtend, userGroupMap map[int64]*entity.UserGroup, groupMap map[int64]*entity.Group) http2.UserInfo {
+	item := http2.UserInfo{
+		Name:     v.Name,
+		Phone:    v.Phone,
+		NickName: v.NickName,
+		Avatar:   v.Avatar,
+		Remark:   v.Remark,
+		Id:       v.Id,
+	}
+	if find, ok := userExtendMap[v.Id]; ok {
+		item.Ip = find.ClientIp
+		item.Online = find.Online
+		if strings.ToLower(find.ProxyType) != "none" {
+			item.Agent = 1
+		} else {
+			item.Agent = 2
+		}
+		item.DeviceName = find.AppVersion
+		item.ProxyIp = find.ProxyIp
+	}
+	if find, ok := userGroupMap[v.Id]; ok {
+		item.GroupId = find.GroupId
+		if findGroup, ok2 := groupMap[find.GroupId]; ok2 {
+			item.GroupName = findGroup.Name
+		}
+	}
+	return item
 }
 func (u *UserServiceImpl) Login(request tcpRequest.LoginRequest) (resp tcp.TcpResponseProtocol, err error) {
 	user := &entity.User{
@@ -336,6 +341,97 @@ func (u *UserServiceImpl) SetUserGroup(request http.SetGroupRequest) (resp http2
 		resp.Code = constants.Status500
 		resp.Msg = err.Error()
 		return
+	}
+	resp.Code = constants.Status200
+	resp.Msg = constants.MessageSuc
+	return
+}
+func (u *UserServiceImpl) ListUserExtend(request http.UserListRequest) (resp http2.UserExtendListResponse, err error) {
+	resp.Data.UserExtends = make([]http2.UserExtendInfo, 0)
+	users := make([]*entity.User, 0)
+	page := &entity.Page{
+		Page:     request.Page,
+		PageSize: request.PageSize,
+	}
+	resp.Data.Page = page.Page
+	resp.Data.PageSize = page.PageSize
+	userIds := make([]int64, 0)
+	if request.UserId != 0 {
+		userIds = append(userIds, request.UserId)
+	}
+	if request.GroupId != 0 {
+		var userGroups []*entity.UserGroup
+		userGroups, err = u.user.SearchUserGroup(u.db, nil, filter.WithGroupId([]int64{request.GroupId}))
+		if err != nil {
+			return
+		}
+		if len(userGroups) == 0 {
+			resp.Code = constants.Status200
+			resp.Msg = constants.MessageSuc
+			return
+		}
+		for _, v := range userGroups {
+			userIds = append(userIds, v.UserId)
+		}
+	}
+	userExtends, err := u.user.SearchUserExtend(u.db, nil, filter.WithInUserId(userIds), filter.WithLickDeviceName(request.DeviceName))
+	if err != nil {
+		return
+	}
+	userExtendMap := map[int64]*entity.UserExtend{}
+	for _, v := range userExtends {
+		userExtendMap[v.UserId] = v
+	}
+	resp.Data.Total = page.Total
+	userIds = make([]int64, 0)
+	for _, v := range users {
+		userIds = append(userIds, v.Id)
+	}
+
+	users, err = u.user.SearchUser(u.db, nil, filter.WithInId(userIds))
+	if err != nil {
+		return
+	}
+	userMap := map[int64]*entity.User{}
+	for _, v := range users {
+		userMap[v.Id] = v
+	}
+	userGroups, err := u.user.SearchUserGroup(u.db, nil, filter.WithInUserId(userIds))
+	if err != nil {
+		return
+	}
+	userGroupMap := map[int64]*entity.UserGroup{}
+	groupIds := make([]int64, 0)
+	for _, v := range userGroups {
+		userGroupMap[v.UserId] = v
+		groupIds = append(groupIds, v.GroupId)
+	}
+	groups, err := u.group.SearchGroup(u.db, nil, filter.WithInId(groupIds))
+	if err != nil {
+		return
+	}
+	groupMap := map[int64]*entity.Group{}
+	for _, v := range groups {
+		groupMap[v.Id] = v
+	}
+	userResponseMap := map[string][]http2.UserInfo{}
+	for _, v := range userExtends {
+		buildInfo := u.buildUserInfo(userMap[v.UserId], userExtendMap, userGroupMap, groupMap)
+		if find, ok := userResponseMap[v.AppVersion]; ok {
+			find = append(find, buildInfo)
+		} else {
+			userResponseMap[v.AppVersion] = []http2.UserInfo{buildInfo}
+		}
+	}
+	for _, v := range userExtends {
+		item := http2.UserExtendInfo{
+			DeviceName: v.AppVersion,
+			Id:         v.Id,
+		}
+		if find, ok := userResponseMap[v.AppVersion]; ok {
+			item.Users = find
+		}
+		resp.Data.UserExtends = append(resp.Data.UserExtends, item)
 	}
 	resp.Code = constants.Status200
 	resp.Msg = constants.MessageSuc

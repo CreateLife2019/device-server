@@ -87,3 +87,14 @@ func WithLickAccount(name string) func(db *gorm.DB) *gorm.DB {
 		return db
 	}
 }
+
+func WithLickDeviceName(name string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if name != "" {
+			condition := "%" + name + "%"
+			db = db.Where("f_app_version like ?  ", condition)
+		}
+
+		return db
+	}
+}

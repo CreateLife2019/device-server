@@ -4,8 +4,10 @@ import "github.com/device-server/domain/base"
 
 type UserListRequest struct {
 	base.PageInfo
-	UserId  int64 `form:"userId,omitempty" json:"userId"`
-	GroupId int64 `form:"groupId,omitempty" json:"groupId"`
+	UserId     int64  `form:"userId,omitempty" json:"userId"`
+	GroupId    int64  `form:"groupId,omitempty" json:"groupId"`
+	Phone      string `form:"phone,omitempty" json:"phone"`
+	DeviceName string `form:"deviceName,omitempty" json:"deviceName"`
 }
 type UserConfigListRequest struct {
 	base.PageInfo

@@ -22,11 +22,25 @@ type UserInfo struct {
 
 type UserListData struct {
 	base.PageInfo
-	Users []UserInfo `json:"Users"`
+	Users []UserInfo `json:"users"`
 }
 type UserListResponse struct {
 	base.BaseResponse
 	Data UserListData `json:"data"`
+}
+type UserExtendInfo struct {
+	Id         int64      `json:"id,string"`
+	DeviceName string     `json:"deviceName"`
+	Users      []UserInfo `json:"users"`
+}
+
+type UserExtendListData struct {
+	base.PageInfo
+	UserExtends []UserExtendInfo `json:"userExtends"`
+}
+type UserExtendListResponse struct {
+	base.BaseResponse
+	Data UserExtendListData `json:"data"`
 }
 
 type SetProxyResponse struct {
